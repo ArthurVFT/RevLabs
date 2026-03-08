@@ -10,9 +10,9 @@ O sistema permite que o usuário selecione um carro, escolha uma pista e configu
 # Integrantes
 
 - Arthur Vitorino Fernandes
-- Daniel Donaire
+- Daniel Donaire da Costa
 - Juan Riquelme Xavier de Souza
-- Kelvin Karan
+- Kelwin Karan Leal Silva
 - Victor Carraly Henrique de Lima Menezes
 
 ---
