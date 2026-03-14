@@ -31,15 +31,15 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 Print do quadro no Jira:
 
-![Jira Board](https://i.nuuls.com/KVm8G.png)
+![Jira Board](https://i.nuuls.com/ecBJy.jpeg)
 
 ---
 
 ## Protótipo Lo-Fi
 
-Protótipo criado no Canva:
+Protótipo criado no Figma:
 
-🎨 [https://link-do-lo-fi](https://www.canva.com/design/DAHDZQLmj0s/_NOGEYCQ0FSP6wvJlbR6vQ/edit?utm_content=DAHDZQLmj0s&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+🎨 [https://link-do-lo-fi](https://www.figma.com/site/OdIN6Yz3m5tqLyyUDy6ttZ/FDS?node-id=0-1&p=f&t=3mvTGMUEcpts8sa0-0)
 
 ---
 
@@ -53,7 +53,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 # Tecnologias utilizadas
 
-- Canva (prototipagem)
+- Figma (prototipagem)
 - Jira (gestão de tarefas)
 - GitHub (versionamento)
 
