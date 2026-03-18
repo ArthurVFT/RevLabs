@@ -1,4 +1,3 @@
-# Projeto-FDS
 # RevLabs
 
 Simulador de configuração de carros e tempo de volta em diferentes circuitos.
