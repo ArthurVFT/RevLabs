@@ -31,7 +31,7 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 Print do quadro no Jira:
 
-![Jira Board](https://i.nuuls.com/ecBJy.jpeg)
+![Jira Board](https://i.nuuls.com/cy9RB.png)
 
 ---
 
