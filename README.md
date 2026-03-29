@@ -28,6 +28,10 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 ## Quadro da Sprint e Backlog
 
+Link do Jira:
+
+![Link do Jira](https://revlabsfds.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
+
 Print do quadro no Jira:
 
 ![Jira Board](https://i.nuuls.com/cy9RB.png)
