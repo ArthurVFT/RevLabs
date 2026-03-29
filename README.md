@@ -4,9 +4,9 @@ Simulador de configuração de carros e tempo de volta em diferentes circuitos.
 
 O sistema permite que o usuário selecione um carro, escolha uma pista e configure peças do veículo (como turbo e aerofólio) para simular o tempo de volta estimado.
 
------------------------------------------
+---
 
-# Integrantes
+## Integrantes
 
 - Arthur Vitorino Fernandes
 - Daniel Donaire da Costa
@@ -16,9 +16,9 @@ O sistema permite que o usuário selecione um carro, escolha uma pista e configu
 
 ---
 
-# Entrega 01
+## Entrega 01
 
-## Histórias de Usuário
+### Histórias de Usuário
 
 Documento contendo as histórias de usuário com critérios de aceitação em BDD:
 
@@ -26,7 +26,7 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 ---
 
-## Quadro da Sprint e Backlog
+### Quadro da Sprint e Backlog
 
 Print do quadro no Jira:
 
@@ -35,7 +35,7 @@ Print do quadro no Jira:
 
 ---
 
-## Protótipo Lo-Fi
+### Protótipo Lo-Fi
 
 Protótipo criado no Figma:
 
@@ -43,7 +43,7 @@ Protótipo criado no Figma:
 
 ---
 
-## Demonstração do Protótipo
+### Demonstração do Protótipo
 
 Vídeo apresentando o protótipo e navegação entre as telas:
 
@@ -51,7 +51,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 ---
 
-# Tecnologias utilizadas
+## Tecnologias utilizadas
 
 - Figma (prototipagem)
 - Jira (gestão de tarefas)
@@ -59,7 +59,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 ---
 
-# Descrição do Sistema
+## Descrição do Sistema
 
 O RevLabs é um simulador que permite testar diferentes configurações de carros em circuitos famosos.
 
