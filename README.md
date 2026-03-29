@@ -30,7 +30,7 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 Link do Jira:
 
-![Link do Jira](https://revlabsfds.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
+[Link do Jira](https://revlabsfds.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
 
 Print do quadro no Jira:
 
