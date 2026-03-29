@@ -1,4 +1,3 @@
-# Projeto-FDS
 # RevLabs
 
 Simulador de configuração de carros e tempo de volta em diferentes circuitos.
@@ -31,7 +30,8 @@ Documento contendo as histórias de usuário com critérios de aceitação em BD
 
 Print do quadro no Jira:
 
-![Jira Board](https://i.nuuls.com/ecBJy.jpeg)
+![Jira Board](https://i.nuuls.com/cy9RB.png)
+![Jira Sprints](https://i.nuuls.com/Atnze.png)
 
 ---
 
