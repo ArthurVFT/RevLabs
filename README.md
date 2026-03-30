@@ -16,7 +16,29 @@ O sistema permite que o usuário selecione um carro, escolha uma pista e configu
 
 ---
 
-## Entrega 01
+## Tecnologias utilizadas
+
+- Figma (prototipagem)
+- Jira (gestão de tarefas)
+- GitHub (versionamento)
+
+---
+
+## Descrição do Sistema
+
+O RevLabs é um simulador que permite testar diferentes configurações de carros em circuitos famosos.
+
+O usuário poderá:
+
+- escolher um carro
+- selecionar uma pista
+- configurar peças do veículo
+- rodar uma simulação de tempo de volta
+
+## Entregaveis
+
+<details>
+<summary>Entrega 1 ✅</summary>
 
 ### Histórias de Usuário
 
@@ -55,21 +77,13 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 ---
 
-## Tecnologias utilizadas
-
-- Figma (prototipagem)
-- Jira (gestão de tarefas)
-- GitHub (versionamento)
-
----
-
-## Descrição do Sistema
-
-O RevLabs é um simulador que permite testar diferentes configurações de carros em circuitos famosos.
-
-O usuário poderá:
-
-- escolher um carro
-- selecionar uma pista
-- configurar peças do veículo
-- rodar uma simulação de tempo de volta
+</details>
+<details>
+<summary>Entrega 2 ✅</summary>
+</details>
+<details>
+<summary>Entrega 3 ✅</summary>
+</details>
+<details>
+<summary>Entrega 4 ✅</summary>
+</details>
