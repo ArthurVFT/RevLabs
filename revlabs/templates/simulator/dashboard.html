@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevLabs - Modifications</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Circuits</a>
+            <a href="#" class="active">Vehicles</a>
+        </div>
+        <div class="user-profile">
+            <span>DanDdC</span>
+            <img src="{% static 'img/avatar-placeholder.png' %}" alt="User Avatar" class="avatar">
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <section class="info-panel">
+            <div class="card track-card">
+                <img src="{% static 'img/interlagos-icon.png' %}" alt="Interlagos">
+                <h3>Interlagos - Brazil</h3>
+            </div>
+            
+            <div class="card vehicle-card">
+                <img src="{% static 'img/mercedes-amg.png' %}" alt="Mercedes AMG GT">
+                <div class="card-footer">Mercedes-AMG GT Black Series '20</div>
+            </div>
+
+            <div class="standard-lap-info">
+                <p>Lap time with Standard setup: <strong>1:38.175</strong></p>
+                <button class="btn-standard-lap">
+                    <span class="play-icon">▶</span> View Standard Lap
+                </button>
+            </div>
+        </section>
+
+        <h2 class="predicted-time">
+            Predicted Lap time with Current setup: <span id="lap-time-display">1:38.175</span>
+        </h2>
+
+        <section class="mod-grid">
+            <div class="mod-slot empty" id="mod-1" onclick="toggleModMenu(event)">
+                <span class="slot-label">MOD 1</span>
+            </div>
+            {% for i in "23456789"|make_list %}
+            <div class="mod-slot empty"><span class="slot-label">MOD {{ i }}</span></div>
+            {% endfor %}
+            <div class="mod-slot empty"><span class="slot-label">MOD 10</span></div>
+        </section>
+
+        <div id="mod-dropdown" class="dropdown-menu hidden">
+            <div class="menu-column main-categories">
+                <ul>
+                    <li>Engine</li>
+                    <li>Suspension</li>
+                    <li>Transmission</li>
+                    <li class="active-category">Aerodynamics</li>
+                    <li>Drivetrain</li>
+                    <li>Brakes</li>
+                    <li>Tyres</li>
+                </ul>
+            </div>
+            <div class="menu-column sub-categories">
+                <ul>
+                    <li>Air Filters</li>
+                    <li>ECU</li>
+                    <li class="active-category">Turbochargers</li>
+                    <li>Superchargers</li>
+                    <li>Pistons</li>
+                </ul>
+            </div>
+            <div class="menu-column parts-list">
+                <div class="part-item" onclick="installPart('Low - RPM Turbocharger', '1:37.435', '{% static 'img/turbo-icon.png' %}')">
+                    <img src="{% static 'img/turbo-icon.png' %}" alt="Turbo">
+                    <span>Low - RPM Turbocharger</span>
+                </div>
+                <div class="part-item" onclick="installPart('Medium - RPM Turbocharger', '1:36.800', '{% static 'img/turbo-icon.png' %}')">
+                    <img src="{% static 'img/turbo-icon.png' %}" alt="Turbo">
+                    <span>Medium - RPM Turbocharger</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

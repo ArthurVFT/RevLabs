@@ -1,0 +1,209 @@
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif; /* Replace with your specific Figma font */
+}
+
+body {
+    background-color: #f5f5f5; /* Light background from mockup */
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #222;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-right: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
+/* Main Dashboard */
+.dashboard-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+/* Info Panel */
+.info-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: #000;
+    color: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    width: 200px;
+    border: 2px solid #333;
+}
+
+.card.track-card {
+    background: #fff;
+    color: #000;
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+}
+
+.card-footer {
+    font-size: 0.8rem;
+    margin-top: 10px;
+}
+
+.standard-lap-info p {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-standard-lap {
+    background: #000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Predicted Time */
+.predicted-time {
+    text-align: center;
+    margin: 2rem 0;
+    font-weight: normal;
+}
+
+.predicted-time span {
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.time-improved {
+    color: #28a745; /* Green color for improved time */
+}
+
+/* Mod Grid */
+.mod-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+}
+
+.mod-slot {
+    background: #fff;
+    border: 3px solid #000;
+    border-radius: 12px;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s;
+}
+
+.mod-slot:hover {
+    transform: scale(1.05);
+}
+
+.mod-slot.filled {
+    background: #222;
+}
+
+.slot-label {
+    background: #000;
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    border-radius: 8px;
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+.menu-column {
+    border-right: 1px solid #eee;
+    padding: 10px 0;
+    min-width: 150px;
+}
+
+.menu-column ul {
+    list-style: none;
+}
+
+.menu-column li {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.menu-column li:hover, .active-category {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+.part-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.part-item:hover {
+    background-color: #f9f9f9;
+}
+
+.part-item img {
+    width: 60px;
+    margin-bottom: 5px;
+}
