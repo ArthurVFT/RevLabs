@@ -1,17 +1,15 @@
-/* Base Styles */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: sans-serif; /* Replace with your specific Figma font */
+    font-family: sans-serif; 
 }
 
 body {
-    background-color: #f5f5f5; /* Light background from mockup */
+    background-color: #f5f5f5; 
     color: #333;
 }
 
-/* Navbar */
 .navbar {
     background-color: #222;
     color: white;
@@ -41,14 +39,12 @@ body {
     background-color: #fff;
 }
 
-/* Main Dashboard */
 .dashboard-container {
     max-width: 1000px;
     margin: 2rem auto;
     padding: 1rem;
 }
 
-/* Info Panel */
 .info-panel {
     display: flex;
     justify-content: space-between;
@@ -76,8 +72,8 @@ body {
 }
 
 .card.track-card img {
-    object-fit: contain; /* Shows the whole track without cropping */
-    padding: 15px; /* Gives the track map breathing room */
+    object-fit: contain; 
+    padding: 15px; 
     background-color: #fff;
 }
 
@@ -85,12 +81,12 @@ body {
     font-size: 0.85rem;
     padding: 12px;
     margin: 0;
-    background-color: #000; /* Ensures the text area stays black */
+    background-color: #000;
     color: #fff;
 }
 
 .card.track-card h3 {
-    background-color: #fff; /* Track text area stays white */
+    background-color: #fff; 
     color: #000;
 }
 
@@ -125,7 +121,7 @@ body {
 }
 
 .time-improved {
-    color: #28a745; /* Green color for improved time */
+    color: #28a745; 
 }
 
 /* Mod Grid */
@@ -152,7 +148,7 @@ body {
 .mod-slot img.installed-mod {
     height: 100%;
     flex: 1;
-    min-height: 0; /* <-- A MÁGICA ESTÁ AQUI! Permite que a imagem encolha */
+    min-height: 0; 
     object-fit: cover;
     margin-top: 0;
 }
@@ -227,7 +223,7 @@ body {
 
 .part-item img {
     width: 80px; 
-    height: 50px; /* Give it a boundary */
-    object-fit: contain; /* Prevents the squished look */
+    height: 50px; 
+    object-fit: contain; 
     margin-bottom: 5px;
 }
