@@ -19,13 +19,11 @@ function installPart(partName, newTime, imagePath) {
     modSlot.classList.add('filled');
     
     const img = document.createElement('img');
-    img.src = imagePath; // Uses the path resolved by Django's {% static %} tag
-    img.style.position = 'absolute';
-    img.style.top = '10px';
-    img.style.width = '70%';
+    img.src = imagePath; 
+    img.className = 'installed-mod';
     
     modSlot.innerHTML = ''; 
-    modSlot.appendChild(img);
+    modSlot.appendChild(img);   
     
     const label = document.createElement('span');
     label.className = 'slot-label';
