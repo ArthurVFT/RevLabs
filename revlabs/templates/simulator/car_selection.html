@@ -41,34 +41,53 @@
                 </div>
             </header>
 
-            <h2 class="top-choices-title">Top Choices</h2>
-
-            <section class="car-grid">
-                <div class="car-card">
-                    <img src="{% static 'img/mercedes-amg.png' %}" alt="Mercedes AMG GT">
-                    <div class="car-name">Mercedes-AMG GT Black Series '20</div>
+            <h2 style="text-align: center; margin-bottom: 2rem;">Top Choices</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 800px; margin: 0 auto;">
+            
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
+                    <img src="{% static 'img/mercedes-amg.png' %}" alt="Mercedes">
+                    <div class="card-footer">Mercedes-AMG GT Black Series '20</div>
                 </div>
-                <div class="car-card">
+            </a>
+            
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
                     <img src="{% static 'img/ferrari-458.png' %}" alt="Ferrari 458">
-                    <div class="car-name">Ferrari 458 Italia '09</div>
+                    <div class="card-footer">Ferrari 458 Italia '09</div>
                 </div>
-                <div class="car-card">
-                    <img src="{% static 'img/porsche-911.png' %}" alt="Porsche 911">
-                    <div class="car-name">Porsche 911 GT3 RS (992) '22</div>
-                </div>
+            </a>
 
-                <div class="car-card">
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
+                    <img src="{% static 'img/porsche-911.png' %}" alt="Porsche 911">
+                    <div class="card-footer">Porsche 911 GT3 RS (992) '22</div>
+                </div>
+            </a>
+
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
                     <img src="{% static 'img/vw-parati.png' %}" alt="VW Parati">
-                    <div class="car-name">VW Parati</div>
+                    <div class="card-footer">VW Parati</div>
                 </div>
-                <div class="car-card">
+            </a>
+
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
                     <img src="{% static 'img/vw-fusca.png' %}" alt="VW Fusca">
-                    <div class="car-name">VW Fusca</div>
+                    <div class="card-footer">VW Fusca</div>
                 </div>
-                <div class="car-card">
+            </a>
+
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div class="card" style="width: 100%; cursor: pointer;">
                     <img src="{% static 'img/vw-brasilia.png' %}" alt="VW Brasilia">
-                    <div class="car-name">VW Brasilia</div>
+                    <div class="card-footer">VW Brasilia</div>
                 </div>
+            </a>
+
+        </div>
             </section>
         </main>
     </div>
