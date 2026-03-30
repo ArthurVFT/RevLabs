@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevLabs - Vehicles</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="selection-body">
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}">Home</a>
+            <a href="#">Circuits</a>
+            <a href="#" class="active" style="font-size: 1.3rem;">Vehicles</a>
+        </div>
+        <div class="user-profile">
+            <span>DanDdC</span>
+            <img src="{% static 'img/avatar-placeholder.png' %}" alt="User Avatar" class="avatar">
+        </div>
+    </nav>
+
+    <div class="selection-container">
+        <aside class="sidebar">
+            <h3 class="filters-title">Filters <span>=</span></h3>
+        </aside>
+
+        <main class="main-selection-content">
+            <header class="selection-header">
+                <div class="track-selected">
+                    <span class="track-label">Track Selected:</span>
+                    <div class="track-icon-wrapper">
+                        <img src="{% static 'img/interlagos-icon.png' %}" alt="Interlagos">
+                        <span class="track-name">Interlagos - Brazil</span>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-bar" placeholder="Search">
+                </div>
+            </header>
+
+            <h2 class="top-choices-title">Top Choices</h2>
+
+            <section class="car-grid">
+                <div class="car-card">
+                    <img src="{% static 'img/mercedes-amg.png' %}" alt="Mercedes AMG GT">
+                    <div class="car-name">Mercedes-AMG GT Black Series '20</div>
+                </div>
+                <div class="car-card">
+                    <img src="{% static 'img/ferrari-458.png' %}" alt="Ferrari 458">
+                    <div class="car-name">Ferrari 458 Italia '09</div>
+                </div>
+                <div class="car-card">
+                    <img src="{% static 'img/porsche-911.png' %}" alt="Porsche 911">
+                    <div class="car-name">Porsche 911 GT3 RS (992) '22</div>
+                </div>
+
+                <div class="car-card">
+                    <img src="{% static 'img/vw-parati.png' %}" alt="VW Parati">
+                    <div class="car-name">VW Parati</div>
+                </div>
+                <div class="car-card">
+                    <img src="{% static 'img/vw-fusca.png' %}" alt="VW Fusca">
+                    <div class="car-name">VW Fusca</div>
+                </div>
+                <div class="car-card">
+                    <img src="{% static 'img/vw-brasilia.png' %}" alt="VW Brasilia">
+                    <div class="car-name">VW Brasilia</div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

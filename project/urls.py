@@ -20,5 +20,6 @@ from revlabs import views # Import your new view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.dashboard, name='dashboard'), # Add the route
+    path('', views.dashboard, name='dashboard'),
+    path('vehicles/', views.car_selection, name='car_selection'),
 ]
