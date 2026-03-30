@@ -28,12 +28,12 @@
             </div>
             
             <div class="card vehicle-card">
-                <img src="{% static 'img/mercedes-amg.png' %}" alt="Mercedes AMG GT">
-                <div class="card-footer">Mercedes-AMG GT Black Series '20</div>
+                <img src="{% static car.image %}" alt="{{ car.name }}">
+                <div class="card-footer">{{ car.name }}</div>
             </div>
 
             <div class="standard-lap-info">
-                <p>Lap time with Standard setup: <strong>1:38.175</strong></p>
+                <p>Lap time with Standard setup: <strong>{{ car.time }}</strong></p>
                 <button class="btn-standard-lap">
                     <span class="play-icon">▶</span> View Standard Lap
                 </button>
@@ -41,7 +41,7 @@
         </section>
 
         <h2 class="predicted-time">
-            Predicted Lap time with Current setup: <span id="lap-time-display">1:38.175</span>
+            Predicted Lap time with Current setup: <span id="lap-time-display">{{ car.time }}</span>
         </h2>
 
         <section class="mod-grid">
