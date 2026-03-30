@@ -80,6 +80,11 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 </details>
 <details>
 <summary>Entrega 2 ✅</summary>
+
+[Print da Sprint no Jira](https://i.nuuls.com/n8WPa.png)
+
+[Print das Issues/Bug tracker no Github](https://i.nuuls.com/2WU6Q.png)
+
 </details>
 <details>
 <summary>Entrega 3 ✅</summary>
