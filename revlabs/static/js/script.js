@@ -44,3 +44,58 @@ document.addEventListener('click', function(event) {
         menu.classList.add('hidden');
     }
 });
+
+function timeToSeconds(timeStr) {
+    const parts = timeStr.split(':');
+    const minutes = parseInt(parts[0], 10);
+    const seconds = parseFloat(parts[1]);
+    return (minutes * 60) + seconds;
+}
+
+function secondsToTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    
+    // Format the seconds to always have 2 digits before the dot and 3 after (e.g., "05.120")
+    let secondsStr = seconds.toFixed(3);
+    if (seconds < 10) {
+        secondsStr = '0' + secondsStr;
+    }
+    
+    return `${minutes}:${secondsStr}`;
+}
+
+function installPart(partName, percentageReduction, imagePath) {
+    const modSlot = document.getElementById('mod-1'); 
+    const timeDisplay = document.getElementById('lap-time-display');
+    const menu = document.getElementById('mod-dropdown');
+
+    // 1. Get the base time stored in the HTML attribute
+    const baseTimeStr = timeDisplay.getAttribute('data-base-time');
+    
+    // 2. Do the math to calculate the new time based on the percentage
+    const baseSeconds = timeToSeconds(baseTimeStr);
+    const newSeconds = baseSeconds * (1 - (percentageReduction / 100));
+    const newTime = secondsToTime(newSeconds);
+
+    // 3. Update the UI
+    modSlot.classList.remove('empty');
+    modSlot.classList.add('filled');
+    
+    const img = document.createElement('img');
+    img.src = imagePath; 
+    img.className = 'installed-mod';
+    
+    modSlot.innerHTML = ''; 
+    modSlot.appendChild(img);   
+    
+    const label = document.createElement('span');
+    label.className = 'slot-label';
+    label.innerText = 'MOD 1';
+    modSlot.appendChild(label);
+
+    timeDisplay.innerText = newTime;
+    timeDisplay.classList.add('time-improved');
+
+    menu.classList.add('hidden');
+}

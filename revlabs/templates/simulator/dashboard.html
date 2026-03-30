@@ -41,7 +41,8 @@
         </section>
 
         <h2 class="predicted-time">
-            Predicted Lap time with Current setup: <span id="lap-time-display">{{ car.time }}</span>
+            Predicted Lap time with Current setup: 
+            <span id="lap-time-display" data-base-time="{{ car.time }}">{{ car.time }}</span>
         </h2>
 
         <section class="mod-grid">
@@ -76,11 +77,12 @@
                 </ul>
             </div>
             <div class="menu-column parts-list">
-                <div class="part-item" onclick="installPart('Low - RPM Turbocharger', '1:37.435', '{% static 'img/turbo-icon.png' %}')">
+                <div class="part-item" onclick="installPart('Low - RPM Turbocharger', 2.5, '{% static 'img/turbo-icon.png' %}')">
                     <img src="{% static 'img/turbo-icon.png' %}" alt="Turbo">
                     <span>Low - RPM Turbocharger</span>
                 </div>
-                <div class="part-item" onclick="installPart('Medium - RPM Turbocharger', '1:36.800', '{% static 'img/turbo-icon.png' %}')">
+                
+                <div class="part-item" onclick="installPart('Medium - RPM Turbocharger', 4.0, '{% static 'img/turbo-icon.png' %}')">
                     <img src="{% static 'img/turbo-icon.png' %}" alt="Turbo">
                     <span>Medium - RPM Turbocharger</span>
                 </div>
