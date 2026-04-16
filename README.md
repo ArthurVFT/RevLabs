@@ -91,7 +91,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Link do Deploy](https://carraly.pythonanywhere.com/)
 
-[Vídeo de Apresentação e Instruções](https://youtu.be/fax3VEnTpkw)
+[Vídeo de Apresentação e Instruções]()
 
 </details>
 <details>
