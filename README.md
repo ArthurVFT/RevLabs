@@ -89,7 +89,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Relatório de Programação em Par](https://docs.google.com/document/d/1KhiwB4KT0rFdzc8w5vW9K5M92utWW6er6-CfM0SG48Q/edit?tab=t.0)
 
-[Link do Deploy](https://carraly.pythonanywhere.com/)
+[Link do Deploy](https://revlabs.onrender.com/)
 
 [Vídeo de Apresentação e Instruções](https://youtu.be/fax3VEnTpkw)
 
