@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from revlabs import views # Import your new view
+from revlabs import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.car_selection, name='car_selection'),
-    path('vehicles/', views.dashboard, name='dashboard'),
+    path('', views.track_selection, name='track_selection'), 
+    path('vehicles/', views.car_selection, name='car_selection'), 
+    path('dashboard/', views.dashboard, name='dashboard'),
 ]

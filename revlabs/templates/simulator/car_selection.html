@@ -30,8 +30,8 @@
                 <div class="track-selected">
                     <span class="track-label">Track Selected:</span>
                     <div class="track-icon-wrapper">
-                        <img src="{% static 'img/interlagos-icon.png' %}" alt="Interlagos">
-                        <span class="track-name">Interlagos - Brazil</span>
+                        <img src="{% static selected_track.image %}" alt="{{ selected_track.name }}">
+                        <span class="track-name">{{ selected_track.name }}</span>
                     </div>
                 </div>
                 
@@ -45,7 +45,7 @@
         
         <div class="car-grid">
             {% for car in cars %}
-            <a href="{% url 'dashboard' %}?car={{ car.id }}" style="text-decoration: none;">
+            <a href="{% url 'dashboard' %}?track={{ selected_track.id }}&car={{ car.id }}" style="text-decoration: none;">
                 <div class="car-card">
                     <img src="{% static car.image %}" alt="{{ car.name }}">
                     <div class="car-name">{{ car.name }}</div>
@@ -53,6 +53,7 @@
             </a>
             {% endfor %}
         </div>
+
             </section>
         </main>
     </div>

@@ -9,33 +9,6 @@ function toggleModMenu(event) {
     menu.classList.toggle('hidden');
 }
 
-// Notice the new imagePath parameter passed from the Django template
-function installPart(partName, newTime, imagePath) {
-    const modSlot = document.getElementById('mod-1'); 
-    const timeDisplay = document.getElementById('lap-time-display');
-    const menu = document.getElementById('mod-dropdown');
-
-    modSlot.classList.remove('empty');
-    modSlot.classList.add('filled');
-    
-    const img = document.createElement('img');
-    img.src = imagePath; 
-    img.className = 'installed-mod';
-    
-    modSlot.innerHTML = ''; 
-    modSlot.appendChild(img);   
-    
-    const label = document.createElement('span');
-    label.className = 'slot-label';
-    label.innerText = 'MOD 1';
-    modSlot.appendChild(label);
-
-    timeDisplay.innerText = newTime;
-    timeDisplay.classList.add('time-improved');
-
-    menu.classList.add('hidden');
-}
-
 document.addEventListener('click', function(event) {
     const menu = document.getElementById('mod-dropdown');
     const modSlot = document.getElementById('mod-1');
