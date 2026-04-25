@@ -23,8 +23,8 @@
     <main class="dashboard-container">
         <section class="info-panel">
             <div class="card track-card">
-                <img src="{% static 'img/interlagos-icon.png' %}" alt="Interlagos">
-                <h3>Interlagos - Brazil</h3>
+                <img src="{% static track.image %}" alt="{{ track.name }}">
+                <h3>{{ track.name }}</h3>
             </div>
             
             <div class="card vehicle-card">
@@ -33,16 +33,17 @@
             </div>
 
             <div class="standard-lap-info">
-                <p>Lap time with Standard setup: <strong>{{ car.time }}</strong></p>
+                <p>Base car lap time: <strong>{{ base_time }}</strong></p>
+    
                 <button class="btn-standard-lap">
-                    <span class="play-icon">▶</span> View Standard Lap
+                <span class="play-icon">▶</span> View Standard Lap
                 </button>
             </div>
         </section>
 
         <h2 class="predicted-time">
-            Predicted Lap time with Current setup: 
-            <span id="lap-time-display" data-base-time="{{ car.time }}">{{ car.time }}</span>
+            Lap time on this track: 
+            <span id="lap-time-display" data-base-time="{{ final_time }}">{{ final_time }}</span>
         </h2>
 
         <section class="mod-grid">
