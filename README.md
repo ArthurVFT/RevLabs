@@ -96,6 +96,19 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 </details>
 <details>
 <summary>Entrega 3 ✅</summary>
+
+[Print da Sprint no Jira](https://i.nuuls.com/-Dxee.png)
+
+[Print das Issues/Bug tracker no Github](https://i.nuuls.com/QlL1Z.png)
+
+[Print do Quadro da Sprint 3 do Jira](https://i.nuuls.com/d7Tmb.png)
+
+[Relatório de Programação em Par](https://docs.google.com/document/d/1KhiwB4KT0rFdzc8w5vW9K5M92utWW6er6-CfM0SG48Q/edit?tab=t.0)
+
+[Testes de Sistema (E2E) Automatizados]()
+
+[Vídeo de Apresentação e Instruções]()
+
 </details>
 <details>
 <summary>Entrega 4 ✅</summary>
