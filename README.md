@@ -103,7 +103,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Print do Quadro da Sprint 3 do Jira](https://i.nuuls.com/d7Tmb.png)
 
-[Relatório de Programação em Par](https://docs.google.com/document/d/1KhiwB4KT0rFdzc8w5vW9K5M92utWW6er6-CfM0SG48Q/edit?tab=t.0)
+[Relatório de Programação em Par](https://docs.google.com/document/d/194o1doQW1E4v-90YMKiuOCRkSrbtxARQBFQzuJJ3ho8/edit?tab=t.0)
 
 [Testes de Sistema (E2E) Automatizados](https://youtu.be/COBp5oGVpak)
 
