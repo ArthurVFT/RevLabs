@@ -105,7 +105,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Relatório de Programação em Par](https://docs.google.com/document/d/1KhiwB4KT0rFdzc8w5vW9K5M92utWW6er6-CfM0SG48Q/edit?tab=t.0)
 
-[Testes de Sistema (E2E) Automatizados]()
+[Testes de Sistema (E2E) Automatizados](https://youtu.be/COBp5oGVpak)
 
 [Vídeo de Apresentação e Instruções]()
 
