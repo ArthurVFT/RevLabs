@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body class="selection-body">
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Circuits</a>
+            <a href="#" class="active" style="font-size: 1.3rem;">Vehicles</a>
+        </div>
+        <div class="user-profile">
+            <span>DanDdC</span>
+            <img src="{% static 'img/avatar-placeholder.png' %}" alt="User Avatar" class="avatar">
+        </div>
+    </nav>
     <h2 style="text-align: center; margin-top: 2rem;">Select your Circuit</h2>
     
     <div class="car-grid">
