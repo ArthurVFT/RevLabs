@@ -1,4 +1,4 @@
-from django.contrib.staticfiles.testing import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -11,7 +11,7 @@ import time
 # -------------------------------------------------------------------------
 # Configuração base extraída do guia
 # -------------------------------------------------------------------------
-class BaseTestCase(LiveServerTestCase):
+class BaseTestCase(StaticLiveServerTestCase):
     """
     Classe-base que inicializa e encerra o Chrome em modo headless
     (sem interface gráfica) antes e depois de cada teste[cite: 31, 32].
@@ -111,36 +111,30 @@ class Teste_01_FluxoSimulador(BaseTestCase):
     def test_04_deve_interagir_com_menu_de_mods(self):
         print("Teste 04: Interação com os MODs e cálculo de tempo no dashboard.")
         
-        # Navega direto para o dashboard do Fusca em Interlagos
         self.abrir_pagina("/dashboard/?track=interlagos&car=fusca")
         
-        # Abre o menu clicando no slot MOD 1
         mod_slot = self.wait.until(
             EC.element_to_be_clickable((By.ID, "mod-1"))
         )
         mod_slot.click()
         
-        # Aguarda o menu dropdown de mods aparecer
         menu = self.wait.until(
             EC.visibility_of_element_located((By.ID, "mod-dropdown"))
         )
         self.assertTrue(menu.is_displayed())
         
-        time.sleep(1)
-        
-        # Instala a parte 'Medium - RPM Turbocharger' (reduz 4% do tempo)
         turbo_option = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//span[text()='Medium - RPM Turbocharger']/ancestor::div[contains(@class, 'part-item')]"))
         )
-        turbo_option.click()
         
-        # O Fusca tem tempo base de 2:30.000 (150 segundos). 
-        # Com redução de 4%, o tempo cai para 144 segundos, ou seja, 2:24.000.
-        time_display = self.wait.until(
-            EC.presence_of_element_located((By.ID, "lap-time-display"))
+        # 1. Use JavaScript to click, bypassing any overlapping elements
+        self.driver.execute_script("arguments[0].click();", turbo_option)
+        
+        # 2. Wait explicitly for the DOM text to update to the new value
+        self.wait.until(
+            EC.text_to_be_present_in_element((By.ID, "lap-time-display"), "2:24.000")
         )
         
-        time.sleep(2)
-        
-        # Verifica se o JS na tela processou o novo tempo com a melhoria
+        # 3. Assert the test
+        time_display = self.driver.find_element(By.ID, "lap-time-display")
         self.assertIn("2:24.000", time_display.text)
