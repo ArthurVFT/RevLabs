@@ -10,9 +10,8 @@
 <body>
     <nav class="navbar">
         <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Circuits</a>
-            <a href="{% url 'car_selection' %}" class="active">Vehicles</a>
+            <a href="{% url 'track_selection' %}">Circuits</a>
+            <a href="{% url 'car_selection' %}?track={{ track.id }}" class="active">Vehicles</a>
         </div>
         <div class="user-profile">
             <span>DanDdC</span>
