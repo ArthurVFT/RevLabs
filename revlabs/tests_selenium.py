@@ -21,8 +21,10 @@ class BaseTestCase(StaticLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
         opts = Options()
-        # Para rodar no GitHub Actions (CI/CD), descomente a linha abaixo[cite: 260]:
-        opts.add_argument("--headless")
+
+        if os.environ.get('GITHUB_ACTIONS'):
+            opts.add_argument("--headless")
+            
         opts.add_argument("--no-sandbox")
         opts.add_argument("--disable-dev-shm-usage")
         opts.add_argument("--disable-gpu")
