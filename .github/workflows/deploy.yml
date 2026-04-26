@@ -29,6 +29,7 @@ jobs:
       env:
         SECRET_KEY: 'dummy-key-for-testing-purposes-only'
       run: |
+        python manage.py collectstatic --noinput
         python manage.py test
 
   deploy:
