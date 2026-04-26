@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import os
 
 # -------------------------------------------------------------------------
 # Configuração base extraída do guia
@@ -24,7 +25,7 @@ class BaseTestCase(StaticLiveServerTestCase):
 
         if os.environ.get('GITHUB_ACTIONS'):
             opts.add_argument("--headless")
-            
+
         opts.add_argument("--no-sandbox")
         opts.add_argument("--disable-dev-shm-usage")
         opts.add_argument("--disable-gpu")
@@ -136,6 +137,8 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.wait.until(
             EC.text_to_be_present_in_element((By.ID, "lap-time-display"), "2:24.000")
         )
+
+        time.sleep(2)
         
         # 3. Assert the test
         time_display = self.driver.find_element(By.ID, "lap-time-display")
