@@ -38,20 +38,21 @@ function secondsToTime(totalSeconds) {
     return `${minutes}:${secondsStr}`;
 }
 
-function installPart(partName, percentageReduction, imagePath) {
+function installPart(partName, speedBoostPercentage, imagePath) {
     const modSlot = document.getElementById('mod-1'); 
     const timeDisplay = document.getElementById('lap-time-display');
     const menu = document.getElementById('mod-dropdown');
 
-    // 1. Get the base time stored in the HTML attribute
-    const baseTimeStr = timeDisplay.getAttribute('data-base-time');
-    
-    // 2. Do the math to calculate the new time based on the percentage
-    const baseSeconds = timeToSeconds(baseTimeStr);
-    const newSeconds = baseSeconds * (1 - (percentageReduction / 100));
+    const trackLengthKm = parseFloat(timeDisplay.getAttribute('data-track-length'));
+    let currentSpeedKmh = parseFloat(timeDisplay.getAttribute('data-current-speed'));
+
+    currentSpeedKmh = currentSpeedKmh * (1 + (speedBoostPercentage / 100));
+
+    const newSeconds = (trackLengthKm / currentSpeedKmh) * 3600;
     const newTime = secondsToTime(newSeconds);
 
-    // 3. Update the UI
+    timeDisplay.setAttribute('data-current-speed', currentSpeedKmh);
+
     modSlot.classList.remove('empty');
     modSlot.classList.add('filled');
     

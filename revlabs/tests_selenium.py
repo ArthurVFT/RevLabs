@@ -133,16 +133,16 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         # 1. Use JavaScript to click, bypassing any overlapping elements
         self.driver.execute_script("arguments[0].click();", turbo_option)
         
-        # 2. Wait explicitly for the DOM text to update to the new value
+        # 2. Wait explicitly for the DOM text to update to the new value (Novo cálculo de Distância / Velocidade)
         self.wait.until(
-            EC.text_to_be_present_in_element((By.ID, "lap-time-display"), "2:24.000")
+            EC.text_to_be_present_in_element((By.ID, "lap-time-display"), "2:22.055")
         )
 
         time.sleep(2)
         
         # 3. Assert the test
         time_display = self.driver.find_element(By.ID, "lap-time-display")
-        self.assertIn("2:24.000", time_display.text)
+        self.assertIn("2:22.055", time_display.text)
 
     def test_05_deve_lembrar_pista_ao_voltar_para_veiculos(self):
         print("Teste 05: Memória da pista ao voltar para seleção de veículos pela navbar.")

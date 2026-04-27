@@ -42,7 +42,11 @@
 
         <h2 class="predicted-time">
             Lap time on this track: 
-            <span id="lap-time-display" data-base-time="{{ final_time }}">{{ final_time }}</span>
+            <span id="lap-time-display" 
+                data-track-length="{{ track_length }}" 
+                data-current-speed="{{ base_speed }}">
+                {{ final_time }}
+            </span>
         </h2>
 
         <section class="mod-grid">
