@@ -143,3 +143,26 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         # 3. Assert the test
         time_display = self.driver.find_element(By.ID, "lap-time-display")
         self.assertIn("2:24.000", time_display.text)
+
+    def test_05_deve_lembrar_pista_ao_voltar_para_veiculos(self):
+        print("Teste 05: Memória da pista ao voltar para seleção de veículos pela navbar.")
+        
+        # Opens the dashboard on a non-default track to ensure it works
+        self.abrir_pagina("/dashboard/?track=monza&car=mercedes")
+        
+        # Clicks the 'Vehicles' link in the top navigation bar
+        link_vehicles = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//nav//a[contains(text(), 'Vehicles')]"))
+        )
+        link_vehicles.click()
+        
+        body = self.wait.until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        
+        # Confirms the page loaded and the track state is Monza, not Interlagos
+        self.assertIn("Top Choices", body.text)
+        self.assertIn("Monza - Italy", body.text)
+        self.assertNotIn("Interlagos - Brazil", body.text)
+        
+        time.sleep(2)
