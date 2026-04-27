@@ -163,27 +163,59 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.assertNotEqual(time_display.text, time_display_initial)
         self.assertNotIn("NaN", time_display.text)
 
-    def test_05_deve_lembrar_pista_ao_voltar_para_veiculos(self):
-        print("Teste 05: Memória da pista ao voltar para seleção de veículos pela navbar.")
+    def test_05_deve_voltar_para_veiculos_e_manter_pista(self):
+        print("Teste 05: Voltar do dashboard para a tela de veículos e verificar se a pista permanece a mesma.")
         
-        # Opens the dashboard on a non-default track to ensure it works
-        self.abrir_pagina("/dashboard/?track=monza&car=mercedes")
-        
-        # Clicks the 'Vehicles' link in the top navigation bar
-        link_vehicles = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//nav//a[contains(text(), 'Vehicles')]"))
-        )
-        link_vehicles.click()
+        # 1. Starts at the Track Selection page
+        self.abrir_pagina("/")
 
         time.sleep(8)
         
-        body = self.wait.until(
+        # 2. Selects a track (e.g., Monza)
+        link_monza = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//h3[text()='Monza - Italy']/ancestor::a"))
+        )
+        link_monza.click()
+
+        time.sleep(8)
+        
+        # Confirms the page navigated to Car Selection and the track is Monza
+        body_vehicles = self.wait.until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        self.assertIn("Top Choices", body_vehicles.text)
+        self.assertIn("Monza - Italy", body_vehicles.text)
+
+        # 3. Select a car to advance to the Dashboard
+        link_carro = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'car-name') and text()='VW Fusca']/ancestor::a"))
+        )
+        link_carro.click()
+
+        time.sleep(8)
+        
+        # Confirms the dashboard loaded correctly
+        body_dash = self.wait.until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        self.assertIn("Lap time on this track", body_dash.text)
+        
+        time.sleep(8) # Small pause for visual confirmation during testing
+        
+        # 4. Clicks the 'Vehicles' link in the top navigation bar to go back
+        link_vehicles_nav = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//nav//a[contains(text(), 'Vehicles')]"))
+        )
+        link_vehicles_nav.click()
+
+        time.sleep(8)
+        
+        # 5. Confirms we successfully went back to the Car Selection page AND the track remained the same
+        body_vehicles_back = self.wait.until(
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
         
-        # Confirms the page loaded and the track state is Monza, not Interlagos
-        self.assertIn("Top Choices", body.text)
-        self.assertIn("Monza - Italy", body.text)
-        self.assertNotIn("Interlagos - Brazil", body.text)
+        self.assertIn("Top Choices", body_vehicles_back.text)
+        self.assertIn("Monza - Italy", body_vehicles_back.text) # Track check assertion
+        self.assertNotIn("Interlagos - Brazil", body_vehicles_back.text)
         
-        time.sleep(8)
