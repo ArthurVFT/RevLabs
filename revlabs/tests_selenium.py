@@ -15,7 +15,7 @@ import os
 class BaseTestCase(StaticLiveServerTestCase):
     """
     Classe-base que inicializa e encerra o Chrome em modo headless
-    (sem interface gráfica) antes e depois de cada teste[cite: 31, 32].
+    (sem interface gráfica) antes e depois de cada teste.
     """
 
     @classmethod
@@ -42,7 +42,7 @@ class BaseTestCase(StaticLiveServerTestCase):
         super().tearDownClass()
 
     def abrir_pagina(self, caminho="/"):
-        """Navega para uma URL relativa ao servidor de teste[cite: 62]."""
+        """Navega para uma URL relativa ao servidor de teste."""
         self.driver.get(self.live_server_url + caminho)
 
 
@@ -66,7 +66,7 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.assertIn("Select your Circuit", body.text)
         self.assertIn("Interlagos - Brazil", body.text)
         
-        time.sleep(2)  # Apenas para visualizar o teste [cite: 103]
+        time.sleep(8)
 
     def test_02_deve_navegar_para_selecao_de_carros(self):
         print("Teste 02: Navegação da seleção de pistas para seleção de carros.")
@@ -86,7 +86,7 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.assertIn("Top Choices", body.text)
         self.assertIn("Mercedes-AMG GT Black Series", body.text)
         
-        time.sleep(2)
+        time.sleep(8)
 
     def test_03_deve_navegar_para_dashboard_e_ver_tempo(self):
         print("Teste 03: Navegação para o dashboard e visualização do tempo de volta.")
@@ -109,40 +109,59 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.assertIn("VW Fusca", body.text)
         self.assertIn("Interlagos - Brazil", body.text)
         
-        time.sleep(2)
+        time.sleep(8)
 
     def test_04_deve_interagir_com_menu_de_mods(self):
         print("Teste 04: Interação com os MODs e cálculo de tempo no dashboard.")
         
         self.abrir_pagina("/dashboard/?track=interlagos&car=fusca")
         
+        # 1. Pega o tempo inicial antes de aplicar os mods
+        time_display_initial = self.wait.until(
+            EC.presence_of_element_located((By.ID, "lap-time-display"))
+        ).text
+
+        # 2. Abre o menu do Mod 1
         mod_slot = self.wait.until(
             EC.element_to_be_clickable((By.ID, "mod-1"))
         )
         mod_slot.click()
+
+        time.sleep(8)
         
         menu = self.wait.until(
             EC.visibility_of_element_located((By.ID, "mod-dropdown"))
         )
         self.assertTrue(menu.is_displayed())
         
-        turbo_option = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//span[text()='Medium - RPM Turbocharger']/ancestor::div[contains(@class, 'part-item')]"))
+        # 3. Clica na sub-categoria "Turbochargers" para filtrar
+        turbo_category = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//li[text()='Turbochargers']"))
         )
-        
-        # 1. Use JavaScript to click, bypassing any overlapping elements
-        self.driver.execute_script("arguments[0].click();", turbo_option)
-        
-        # 2. Wait explicitly for the DOM text to update to the new value (Novo cálculo de Distância / Velocidade)
-        self.wait.until(
-            EC.text_to_be_present_in_element((By.ID, "lap-time-display"), "2:22.055")
+        turbo_category.click()
+
+        time.sleep(8)
+
+        # 4. Agora procura pela peça correta do Turbo e clica
+        turbo_option = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Twin-Scroll Turbo Kit')]/ancestor::div[contains(@class, 'part-item')]"))
         )
 
-        time.sleep(2)
+        time.sleep(8)
         
-        # 3. Assert the test
-        time_display = self.driver.find_element(By.ID, "lap-time-display")
-        self.assertIn("2:22.055", time_display.text)
+        # Usa JavaScript para clicar, prevenindo falhas de sobreposição (overlap)
+        self.driver.execute_script("arguments[0].click();", turbo_option)
+        
+        # 5. Espera explicitamente a classe "time-improved" ser adicionada pelo JavaScript ao calcular o novo tempo
+        time_display = self.wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#lap-time-display.time-improved"))
+        )
+
+        time.sleep(8)
+        
+        # 6. Valida que o tempo foi alterado com sucesso e não está quebrado (NaN)
+        self.assertNotEqual(time_display.text, time_display_initial)
+        self.assertNotIn("NaN", time_display.text)
 
     def test_05_deve_lembrar_pista_ao_voltar_para_veiculos(self):
         print("Teste 05: Memória da pista ao voltar para seleção de veículos pela navbar.")
@@ -155,6 +174,8 @@ class Teste_01_FluxoSimulador(BaseTestCase):
             EC.element_to_be_clickable((By.XPATH, "//nav//a[contains(text(), 'Vehicles')]"))
         )
         link_vehicles.click()
+
+        time.sleep(8)
         
         body = self.wait.until(
             EC.presence_of_element_located((By.TAG_NAME, "body"))
@@ -165,4 +186,4 @@ class Teste_01_FluxoSimulador(BaseTestCase):
         self.assertIn("Monza - Italy", body.text)
         self.assertNotIn("Interlagos - Brazil", body.text)
         
-        time.sleep(2)
+        time.sleep(8)

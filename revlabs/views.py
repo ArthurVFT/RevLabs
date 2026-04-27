@@ -1,12 +1,12 @@
 from django.shortcuts import render
 
 CARS = {
-    'mercedes': {'id': 'mercedes', 'name': "Mercedes-AMG GT Black Series '20", 'image': 'img/mercedes-amg.png', 'base_avg_speed_kmh': 210.0},
-    'ferrari':  {'id': 'ferrari',  'name': "Ferrari 458 Italia '09",           'image': 'img/ferrari-458.png',  'base_avg_speed_kmh': 205.0},
-    'porsche':  {'id': 'porsche',  'name': "Porsche 911 GT3 RS (992) '22",    'image': 'img/porsche-911.png',  'base_avg_speed_kmh': 208.0},
-    'parati':   {'id': 'parati',   'name': "VW Parati",                        'image': 'img/vw-parati.png',    'base_avg_speed_kmh': 115.0},
-    'fusca':    {'id': 'fusca',    'name': "VW Fusca",                         'image': 'img/vw-fusca.png',     'base_avg_speed_kmh': 105.0},
-    'brasilia': {'id': 'brasilia', 'name': "VW Brasilia",                      'image': 'img/vw-brasilia.png',  'base_avg_speed_kmh': 110.0}
+    'mercedes': {'id': 'mercedes', 'name': "Mercedes-AMG GT Black Series '20", 'image': 'img/mercedes-amg.png', 'base_avg_speed_kmh': 210.0, 'power_hp': 730, 'weight_kg': 1540},
+    'ferrari':  {'id': 'ferrari',  'name': "Ferrari 458 Italia '09",           'image': 'img/ferrari-458.png',  'base_avg_speed_kmh': 205.0, 'power_hp': 570, 'weight_kg': 1485},
+    'porsche':  {'id': 'porsche',  'name': "Porsche 911 GT3 RS (992) '22",    'image': 'img/porsche-911.png',  'base_avg_speed_kmh': 208.0, 'power_hp': 525, 'weight_kg': 1450},
+    'parati':   {'id': 'parati',   'name': "VW Parati",                        'image': 'img/vw-parati.png',    'base_avg_speed_kmh': 115.0, 'power_hp': 90,  'weight_kg': 950},
+    'fusca':    {'id': 'fusca',    'name': "VW Fusca",                         'image': 'img/vw-fusca.png',     'base_avg_speed_kmh': 105.0, 'power_hp': 65,  'weight_kg': 800},
+    'brasilia': {'id': 'brasilia', 'name': "VW Brasilia",                      'image': 'img/vw-brasilia.png',  'base_avg_speed_kmh': 110.0, 'power_hp': 65,  'weight_kg': 890}
 }
 
 TRACKS = {
@@ -52,12 +52,17 @@ def dashboard(request):
     
     base_seconds = (track_length / base_speed) * 3600
     final_time = seconds_to_time(base_seconds)
+
+    base_power = selected_car['power_hp']
+    base_weight = selected_car['weight_kg']
     
     context = {
         'car': selected_car,
         'track': selected_track,
         'final_time': final_time,
         'track_length': track_length,
-        'base_speed': base_speed
+        'base_speed': base_speed,
+        'base_power': base_power,
+        'base_weight': base_weight
     }
     return render(request, 'simulator/dashboard.html', context)
