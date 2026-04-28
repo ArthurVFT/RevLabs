@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RevLabs - Vehicles</title>
+    <title>RevLabs - Modifications</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body class="selection-body">
+<body>
     <nav class="navbar">
         <div class="nav-links">
             <a href="{% url 'track_selection' %}">Circuits</a>
-            <a href="{% url 'car_selection' %}?track={{ selected_track.id }}" class="active" style="font-size: 1.3rem;">Vehicles</a>
+            <a href="{% url 'car_selection' %}?track={{ track.id }}" class="active">Vehicles</a>
         </div>
         <div class="user-profile">
             <span>DanDdC</span>
@@ -19,38 +19,96 @@
         </div>
     </nav>
 
-    <div class="selection-container">
-        <main class="main-selection-content">
-            <header class="selection-header">
-                <div class="track-selected">
-                    <span class="track-label">Track Selected:</span>
-                    <div class="track-icon-wrapper">
-                        <img src="{% static selected_track.image %}" alt="{{ selected_track.name }}">
-                        <span class="track-name">{{ selected_track.name }}</span>
-                    </div>
-                </div>
-                
-                <div class="search-container">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" class="search-bar" placeholder="Search">
-                </div>
-            </header>
+    <main class="dashboard-container">
+        <section class="info-panel">
+            <div class="card track-card">
+                <img src="{% static track.image %}" alt="{{ track.name }}">
+                <h3>{{ track.name }}</h3>
+            </div>
+            
+            <div class="card vehicle-card">
+                <img src="{% static car.image %}" alt="{{ car.name }}">
+                <div class="card-footer">{{ car.name }}</div>
+            </div>
 
-            <h2 style="text-align: center; margin-bottom: 2rem;">Top Choices</h2>
-        
-        <div class="car-grid">
-            {% for car in cars %}
-            <a href="{% url 'dashboard' %}?track={{ selected_track.id }}&car={{ car.id }}" style="text-decoration: none;">
-                <div class="car-card">
-                    <img src="{% static car.image %}" alt="{{ car.name }}">
-                    <div class="car-name">{{ car.name }}</div>
-                </div>
-            </a>
+            <div class="standard-lap-info">
+                <p>Base car lap time: <strong>{{ base_time }}</strong></p>
+    
+                <button class="btn-standard-lap">
+                <span class="play-icon">▶</span> View Standard Lap
+                </button>
+            </div>
+        </section>
+
+        <h2 class="predicted-time">
+            Lap time on this track: 
+            <span id="lap-time-display" 
+                data-track-length="{{ track_length }}" 
+                data-base-speed="{{ base_speed }}"
+                data-base-power="{{ base_power }}"
+                data-base-weight="{{ base_weight }}">
+                {{ final_time }}
+            </span>
+        </h2>
+
+        <section class="mod-grid">
+            {% for i in "1234567890"|make_list %}
+            <div class="mod-slot empty" id="mod-{% if i == '0' %}10{% else %}{{ i }}{% endif %}" onclick="toggleModMenu(event)">
+                <span class="slot-label">MOD {% if i == '0' %}10{% else %}{{ i }}{% endif %}</span>
+            </div>
             {% endfor %}
-        </div>
+        </section>
 
-            </section>
-        </main>
-    </div>
+        <div id="mod-dropdown" class="dropdown-menu hidden">
+            <div class="menu-column main-categories">
+                <ul>
+                    <li class="active-category">Engine</li>
+                    <li>Suspension</li>
+                    <li>Transmission</li>
+                    <li>Aerodynamics</li>
+                    <li>Drivetrain</li>
+                    <li>Brakes</li>
+                    <li>Tyres</li>
+                </ul>
+            </div>
+            <div class="menu-column sub-categories">
+                <ul>
+                    <li class="active-category" onclick="filterParts('Air Filters', this)">Air Filters</li>
+                    <li onclick="filterParts('ECU', this)">ECU</li>
+                    <li onclick="filterParts('Turbochargers', this)">Turbochargers</li>
+                    <li onclick="filterParts('Superchargers', this)">Superchargers</li>
+                    <li onclick="filterParts('Pistons', this)">Pistons</li>
+                </ul>
+            </div>
+            <div class="menu-column parts-list">
+                <div class="part-item" data-subcategory="Air Filters" onclick="installPart('Cold Air Intake', 12, -1, '{% static 'img/filtro-ar.png' %}')">
+                    <img src="{% static 'img/filtro-ar.png' %}" alt="Air Intake">
+                    <span>Cold Air Intake (+12 HP, -1 kg)</span>
+                </div>
+
+                <div class="part-item" data-subcategory="ECU" style="display: none;" onclick="installPart('Stage 2 ECU Remap', 55, 0, '{% static 'img/ecu.png' %}')">
+                    <img src="{% static 'img/ecu.png' %}" alt="ECU Remap">
+                    <span>Stage 2 ECU Remap (+55 HP, 0 kg)</span>
+                </div>
+
+                <div class="part-item" data-subcategory="Turbochargers" style="display: none;" onclick="installPart('Twin-Scroll Turbo Kit', 140, 18, '{% static 'img/turbo-icon.png' %}')">
+                    <img src="{% static 'img/turbo-icon.png' %}" alt="Turbo Kit">
+                    <span>Twin-Scroll Turbo Kit (+140 HP, +18 kg)</span>
+                </div>
+
+                <div class="part-item" data-subcategory="Superchargers" style="display: none;" onclick="installPart('Roots Supercharger', 110, 25, '{% static 'img/supercompressor.png' %}')">
+                    <img src="{% static 'img/supercompressor.png' %}" alt="Supercharger">
+                    <span>Roots Supercharger (+110 HP, +25 kg)</span>
+                </div>
+
+                <div class="part-item" data-subcategory="Pistons" style="display: none;" onclick="installPart('Forged Aluminum Pistons', 20, -3, '{% static 'img/pistao.png' %}')">
+                    <img src="{% static 'img/pistao.png' %}" alt="Forged Pistons">
+                    <span>Forged Aluminum Pistons (+20 HP, -3 kg)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
