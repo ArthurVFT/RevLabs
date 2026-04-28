@@ -107,7 +107,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Testes de Sistema (E2E) Automatizados](https://youtu.be/YhEv19FcJ48)
 
-[Vídeo de Apresentação e Instruções]()
+[Vídeo de Apresentação e Instruções](https://youtu.be/GqIwE72qJMY)
 
 </details>
 <details>
