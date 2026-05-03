@@ -68,13 +68,11 @@ function installPart(partName, addedHp, addedWeight, imagePath) {
 function recalculatePerformance() {
     const timeDisplay = document.getElementById('lap-time-display');
     
-    // Obtém os valores base do HTML
     const trackLengthKm = parseFloat(timeDisplay.getAttribute('data-track-length'));
     const baseSpeedKmh = parseFloat(timeDisplay.getAttribute('data-base-speed'));
     const basePower = parseFloat(timeDisplay.getAttribute('data-base-power'));
     const baseWeight = parseFloat(timeDisplay.getAttribute('data-base-weight'));
 
-    // Soma os atributos base com todas as modificações instaladas
     let totalPower = basePower;
     let totalWeight = baseWeight;
 
@@ -83,19 +81,30 @@ function recalculatePerformance() {
         totalWeight += installedMods[slotId].weight;
     }
 
-    // Fórmula mais fiel à realidade (Relação Potência/Peso impactando a velocidade)
-    // A velocidade não escala linearmente com a potência devido ao arrasto aerodinâmico.
-    // Usamos um expoente fracionário para suavizar o impacto.
-    const powerMultiplier = Math.pow((totalPower / basePower), 0.35);
-    const weightMultiplier = Math.pow((baseWeight / totalWeight), 0.25);
+    // FÍSICA REALISTA: O limite do pneu de rua e da tração mecânica.
+    let powerRatio = totalPower / basePower;
+    let powerExponent = 0.30; // Ganho bom para carros fracos (ex: Fusca e Parati)
+
+    if (basePower >= 500) {
+        // Supercarros já operam no limite da aderência. 
+        // Mais potência bruta tem um impacto minúsculo no tempo de volta sem instalar aerofólios e pneus slick.
+        powerExponent = 0.05; 
+    } else if (totalPower > 250) {
+        // Carros comuns que receberam muitas peças e passaram de 250cv começam 
+        // a patinar pneu em excesso na saída de curva. O ganho de tempo cai drasticamente.
+        powerExponent = 0.15;
+    }
+
+    const powerMultiplier = Math.pow(powerRatio, powerExponent);
+    
+    // O peso, ao contrário da potência, melhora curva, aceleração e frenagem linearmente.
+    const weightMultiplier = Math.pow((baseWeight / totalWeight), 0.50);
     
     const newSpeedKmh = baseSpeedKmh * powerMultiplier * weightMultiplier;
     
-    // Calcula o novo tempo
     const newSeconds = (trackLengthKm / newSpeedKmh) * 3600;
     const newTime = secondsToTime(newSeconds);
 
-    // Atualiza a tela
     timeDisplay.innerText = newTime;
     timeDisplay.classList.add('time-improved');
 }
