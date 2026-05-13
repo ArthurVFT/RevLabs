@@ -25,7 +25,7 @@
                 <div class="track-selected">
                     <span class="track-label">Track Selected:</span>
                     <div class="track-icon-wrapper">
-                        <img src="{% static selected_track.image %}" alt="{{ selected_track.name }}">
+                        <img src="{% static selected_track.image_path %}" alt="{{ selected_track.name }}">
                         <span class="track-name">{{ selected_track.name }}</span>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
             {% for car in cars %}
             <a href="{% url 'dashboard' %}?track={{ selected_track.id }}&car={{ car.id }}" style="text-decoration: none;">
                 <div class="car-card">
-                    <img src="{% static car.image %}" alt="{{ car.name }}">
+                    <img src="{% static car.image_path %}" alt="{{ car.name }}">
                     <div class="car-name">{{ car.name }}</div>
                 </div>
             </a>
