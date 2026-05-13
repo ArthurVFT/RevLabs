@@ -21,6 +21,8 @@ else:
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+
 # Application definition
 
 INSTALLED_APPS = [
