@@ -29,10 +29,15 @@ document.querySelectorAll('.mod-slot').forEach(slot => {
         modModal.style.left = `${leftPosition}px`;
 
         modModal.showModal();
+
+        const engineTab = document.querySelector('[data-target-main="engine"]');
+        if (engineTab) engineTab.click();
     });
 });
 
 modModal.addEventListener('click', (event) => {
+    if (event.clientX === 0 && event.clientY === 0) return;
+
     const rect = modModal.getBoundingClientRect();
     const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
                         rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
@@ -93,7 +98,7 @@ document.getElementById('category-list').addEventListener('click', (event) => {
     }
 });
 
-document.querySelector('.modal-parts-grid').addEventListener('click', (event) => {
+document.getElementById('modal-parts-grid').addEventListener('click', (event) => {
     const partItem = event.target.closest('.part-item');
     if (!partItem || !activeSlotId) return;
 
