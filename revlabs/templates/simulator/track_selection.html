@@ -19,9 +19,13 @@
     </nav>
     <h2 style="text-align: center; margin-top: 2rem;">Select your Circuit</h2>
     
-    <div class="car-grid">
+    <div class="search-container" style="display: flex; justify-content: center; margin: 1.5rem 0 2rem 0;">
+        <input type="text" id="track-search" class="search-bar rectangular-search" placeholder="Search circuits...">
+    </div>
+
+    <div class="car-grid" id="track-grid-container">
         {% for track in tracks %}
-        <a href="{% url 'car_selection' %}?track={{ track.slug_id }}" style="text-decoration: none;">
+        <a href="{% url 'car_selection' %}?track={{ track.slug_id }}" class="track-link" style="text-decoration: none;">
             <div class="card track-card" style="width: auto;">
                 <img src="{% static track.image_path %}" alt="{{ track.name }}">
                 <h3>{{ track.name }}</h3>
@@ -29,5 +33,21 @@
         </a>
         {% endfor %}
     </div>
+
+    <script>
+        document.getElementById('track-search').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const tracks = document.querySelectorAll('.track-link');
+            
+            tracks.forEach(track => {
+                const name = track.querySelector('h3').innerText.toLowerCase();
+                if(name.includes(term)) {
+                    track.style.display = 'block';
+                } else {
+                    track.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

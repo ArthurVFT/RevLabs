@@ -1,152 +1,186 @@
-// Variáveis globais para gerenciar o estado
-let activeSlotId = null; 
-let installedMods = {}; // Ex: { 'mod-1': { hp: 30, weight: 5 }, 'mod-2': ... }
+let installedMods = {}; 
 
-const modModal = document.getElementById('mod-modal');
+const incompatibilityMap = {
+    "Twin-Scroll Turbo Kit": ["Roots Supercharger"],
+    "Roots Supercharger": ["Twin-Scroll Turbo Kit"],
+    "Street Coilovers": ["Fully Adjustable Race Coilovers"],
+    "Fully Adjustable Race Coilovers": ["Street Coilovers"]
+};
 
-document.querySelectorAll('.mod-slot').forEach(slot => {
-    slot.addEventListener('click', (event) => {
-        activeSlotId = event.currentTarget.id;
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('mod-modal');
+    const addModBtn = document.getElementById('add-mod-btn');
+    const mainCategories = document.querySelectorAll('#main-category-list li');
+    const subCategories = document.querySelectorAll('#category-list li');
+    const parts = document.querySelectorAll('.part-item');
 
-        const rect = event.currentTarget.getBoundingClientRect();
-        let topPosition = rect.top;
-        let leftPosition = rect.left;
+    addModBtn.addEventListener('click', () => {
+        const rect = addModBtn.getBoundingClientRect();
+        
+        modal.style.margin = '0';
+        modal.style.right = 'auto';
+        modal.style.bottom = 'auto';
+        
+        modal.style.top = `${rect.bottom + 10}px`;
+        modal.style.left = `${rect.left + (rect.width / 2)}px`;
+        modal.style.transform = 'translateX(-50%)';
+        
+        modal.showModal();
+        
+        const defaultTab = document.querySelector('[data-target-main="engine"]');
+        if (defaultTab) defaultTab.click();
+    });
 
-        // Prevent the menu from going off the right side of the screen
-        const modalWidth = 600; 
-        if (leftPosition + modalWidth > window.innerWidth) {
-            leftPosition = window.innerWidth - modalWidth - 100; 
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.close();
         }
+    });
 
-        // Prevent the menu from going off the bottom of the screen
-        const modalHeight = window.innerHeight * 0.5; // roughly 50vh as defined in CSS
-        if (topPosition + modalHeight > window.innerHeight) {
-            topPosition = rect.bottom - modalHeight/3 - 30; // Pop it open ABOVE the slot instead
-        }
+    mainCategories.forEach(mainLi => {
+        mainLi.addEventListener('click', () => {
+            mainCategories.forEach(li => li.classList.remove('active-main'));
+            mainLi.classList.add('active-main');
 
-        // Apply the calculated positions
-        modModal.style.top = `${topPosition}px`;
-        modModal.style.left = `${leftPosition+200}px`;
+            const targetMain = mainLi.getAttribute('data-target-main');
+            subCategories.forEach(subLi => {
+                if (subLi.getAttribute('data-main-cat') === targetMain) {
+                    subLi.style.display = 'block';
+                } else {
+                    subLi.style.display = 'none';
+                }
+                subLi.classList.remove('active-category');
+            });
+            parts.forEach(part => part.style.display = 'none');
+        });
+    });
 
-        modModal.showModal();
+    subCategories.forEach(subLi => {
+        subLi.addEventListener('click', () => {
+            subCategories.forEach(li => li.classList.remove('active-category'));
+            subLi.classList.add('active-category');
 
-        const engineTab = document.querySelector('[data-target-main="engine"]');
-        if (engineTab) engineTab.click();
+            const targetCat = subLi.getAttribute('data-target');
+            parts.forEach(part => {
+                if (part.classList.contains(targetCat)) {
+                    part.style.display = 'flex';
+                } else {
+                    part.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    parts.forEach(part => {
+        part.addEventListener('click', () => {
+            const partName = part.getAttribute('data-name');
+            const addedHp = parseFloat(part.getAttribute('data-hp'));
+            const addedWeight = parseFloat(part.getAttribute('data-weight'));
+            const imagePath = part.getAttribute('data-img');
+
+            const activeSubLi = document.querySelector('#category-list li.active-category');
+            const mainCat = activeSubLi ? activeSubLi.getAttribute('data-main-cat') : '';
+
+            // 1. Validação de item idêntico já instalado
+            if (installedMods[partName]) {
+                alert('already installed');
+                return;
+            }
+
+            // 2. Regra de Negócio de Pneus: Troca de compostos
+            if (mainCat === 'tyres') {
+                let existingTyreName = null;
+                for (const name in installedMods) {
+                    if (installedMods[name].mainCat === 'tyres') {
+                        existingTyreName = name;
+                        break;
+                    }
+                }
+
+                if (existingTyreName) {
+                    const swap = confirm(`${partName} is already installed, do you want to switch compounds?`);
+                    if (swap) {
+                        delete installedMods[existingTyreName];
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+            // 3. Validação de incompatibilidades cruzadas externas
+            const conflicts = incompatibilityMap[partName] || [];
+            for (const conflictMod of conflicts) {
+                if (installedMods[conflictMod]) {
+                    alert(`${partName} isn't compatible with ${conflictMod}`);
+                    return;
+                }
+            }
+
+            // Adiciona a peça nova ao estado
+            installedMods[partName] = {
+                hp: addedHp,
+                weight: addedWeight,
+                img: imagePath,
+                mainCat: mainCat
+            };
+
+            renderInstalledMods();
+            modal.close();
+        });
     });
 });
 
-modModal.addEventListener('click', (event) => {
-    if (event.clientX === 0 && event.clientY === 0) return;
+// Renderização dinâmica da lista empilhada
+function renderInstalledMods() {
+    const listContainer = document.getElementById('installed-mods-list');
+    listContainer.innerHTML = '';
 
-    const rect = modModal.getBoundingClientRect();
-    const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
-                        rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
-    if (!isInDialog) {
-        modModal.close();
-        activeSlotId = null;
+    for (const partName in installedMods) {
+        const mod = installedMods[partName];
+        const row = document.createElement('div');
+        row.className = 'installed-mod-row';
+
+        const hpDisplay = mod.hp >= 0 ? `+${mod.hp} HP` : `${mod.hp} HP`;
+        const weightDisplay = mod.weight >= 0 ? `+${mod.weight} kg` : `${mod.weight} kg`;
+
+        row.innerHTML = `
+            <div class="mod-left-info">
+                <img src="${mod.img}" alt="${partName}" class="mod-row-img">
+                <div class="mod-text-details">
+                    <h4>${partName}</h4>
+                    <p class="mod-short-desc">Componente de alto rendimento configurado para Track Days.</p>
+                </div>
+            </div>
+            <div class="mod-right-stats">
+                <span class="stat-badge hp">${hpDisplay}</span>
+                <span class="stat-badge weight">${weightDisplay}</span>
+                <button class="btn-remove-mod" onclick="removeModification('${partName}')">✕</button>
+            </div>
+        `;
+        listContainer.appendChild(row);
     }
-});
-
-
-document.getElementById('main-category-list').addEventListener('click', (event) => {
-    if (event.target.tagName === 'LI') {
-        // 1. Highlight clicked main category
-        document.querySelectorAll('#main-category-list li').forEach(li => li.classList.remove('active-main'));
-        event.target.classList.add('active-main');
-        
-        const selectedMainCat = event.target.getAttribute('data-target-main');
-        const subCategories = document.querySelectorAll('#category-list li');
-        let firstVisibleSubCat = null;
-
-        // 2. Filter Column 2 (Subcategories) based on the clicked Main Category
-        subCategories.forEach(subLi => {
-            if (subLi.getAttribute('data-main-cat') === selectedMainCat) {
-                subLi.style.display = 'block'; // Show it
-                if (!firstVisibleSubCat) firstVisibleSubCat = subLi; // Remember the first one
-            } else {
-                subLi.style.display = 'none'; // Hide it
-            }
-        });
-
-        // 3. Automatically click the first visible subcategory to update Column 3
-        if (firstVisibleSubCat) {
-            firstVisibleSubCat.click();
-        } else {
-            // Hide all parts if this category is completely empty
-            document.querySelectorAll('.part-item').forEach(part => part.style.display = 'none');
-        }
-    }
-});
-
-document.getElementById('category-list').addEventListener('click', (event) => {
-    if (event.target.tagName === 'LI') {
-        // 1. Highlight clicked subcategory
-        document.querySelectorAll('#category-list li').forEach(li => li.classList.remove('active-sub'));
-        event.target.classList.add('active-sub');
-
-        const targetCategory = event.target.getAttribute('data-target');
-        const allParts = document.querySelectorAll('.part-item');
-
-        // 2. Filter Column 3 (Parts) based on the clicked Subcategory
-        allParts.forEach(part => {
-            if (part.classList.contains(targetCategory)) {
-                part.style.display = 'flex';
-            } else {
-                part.style.display = 'none';
-            }
-        });
-    }
-});
-
-document.getElementById('modal-parts-grid').addEventListener('click', (event) => {
-    const partItem = event.target.closest('.part-item');
-    if (!partItem || !activeSlotId) return;
-
-    // Retrieve data from the data-* attributes
-    const name = partItem.getAttribute('data-name');
-    const hp = parseFloat(partItem.getAttribute('data-hp'));
-    const weight = parseFloat(partItem.getAttribute('data-weight'));
-    const imgUrl = partItem.getAttribute('data-img');
-
-    // Register the part in the state
-    installedMods[activeSlotId] = { hp: hp, weight: weight };
-
-    // Update UI
-    const modSlot = document.getElementById(activeSlotId);
-    modSlot.classList.remove('empty');
-    modSlot.classList.add('filled');
-    modSlot.innerHTML = `
-        <img src="${imgUrl}" class="installed-mod" alt="${name}">
-        <span class="slot-label">${activeSlotId.replace('-', ' ').toUpperCase()}</span>
-    `;
 
     recalculatePerformance();
-    modModal.close();
-});
-
-function timeToSeconds(timeStr) {
-    const parts = timeStr.split(':');
-    const minutes = parseInt(parts[0], 10);
-    const seconds = parseFloat(parts[1]);
-    return (minutes * 60) + seconds;
 }
+
+// Expõe a remoção globalmente para funcionamento do atributo onclick
+window.removeModification = function(partName) {
+    delete installedMods[partName];
+    renderInstalledMods();
+};
 
 function secondsToTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    
-    // Format the seconds to always have 2 digits before the dot and 3 after (e.g., "05.120")
     let secondsStr = seconds.toFixed(3);
-    if (seconds < 10) {
-        secondsStr = '0' + secondsStr;
-    }
-    
+    if (seconds < 10) secondsStr = '0' + secondsStr;
     return `${minutes}:${secondsStr}`;
 }
 
 function recalculatePerformance() {
     const timeDisplay = document.getElementById('lap-time-display');
-    
+    if (!timeDisplay) return;
+
     const trackLengthKm = parseFloat(timeDisplay.getAttribute('data-track-length'));
     const baseSpeedKmh = parseFloat(timeDisplay.getAttribute('data-base-speed'));
     const basePower = parseFloat(timeDisplay.getAttribute('data-base-power'));
@@ -155,35 +189,24 @@ function recalculatePerformance() {
     let totalPower = basePower;
     let totalWeight = baseWeight;
 
-    for (const slotId in installedMods) {
-        totalPower += installedMods[slotId].hp;
-        totalWeight += installedMods[slotId].weight;
+    for (const name in installedMods) {
+        totalPower += installedMods[name].hp;
+        totalWeight += installedMods[name].weight;
     }
 
-    // FÍSICA REALISTA: O limite do pneu de rua e da tração mecânica.
     let powerRatio = totalPower / basePower;
-    let powerExponent = 0.30; // Ganho bom para carros fracos (ex: Fusca e Parati)
+    let powerExponent = 0.30; 
 
     if (basePower >= 500) {
-        // Supercarros já operam no limite da aderência. 
-        // Mais potência bruta tem um impacto minúsculo no tempo de volta sem instalar aerofólios e pneus slick.
         powerExponent = 0.05; 
     } else if (totalPower > 250) {
-        // Carros comuns que receberam muitas peças e passaram de 250cv começam 
-        // a patinar pneu em excesso na saída de curva. O ganho de tempo cai drasticamente.
         powerExponent = 0.15;
     }
 
     const powerMultiplier = Math.pow(powerRatio, powerExponent);
-    
-    // O peso, ao contrário da potência, melhora curva, aceleração e frenagem linearmente.
     const weightMultiplier = Math.pow((baseWeight / totalWeight), 0.50);
-    
     const newSpeedKmh = baseSpeedKmh * powerMultiplier * weightMultiplier;
     
     const newSeconds = (trackLengthKm / newSpeedKmh) * 3600;
-    const newTime = secondsToTime(newSeconds);
-
-    timeDisplay.innerText = newTime;
-    timeDisplay.classList.add('time-improved');
+    timeDisplay.innerText = secondsToTime(newSeconds);
 }

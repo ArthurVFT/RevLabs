@@ -51,12 +51,12 @@
             </span>
         </h2>
 
-        <section class="mod-grid">
-            {% for i in "1234567890"|make_list %}
-            <div class="mod-slot empty" id="mod-{{ forloop.counter }}">
-                <span class="slot-label">MOD {{ forloop.counter }}</span>
-            </div>
-            {% endfor %}
+        <section class="dynamic-mod-container">
+            <div id="installed-mods-list" class="installed-mods-list">
+                </div>
+            <button id="add-mod-btn" class="btn-add-mod">
+                <span class="plus-icon">+</span> Add Modification
+            </button>
         </section>
 
         <dialog id="mod-modal" class="mod-modal">
