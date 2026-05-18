@@ -123,7 +123,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Testes de Sistema (E2E)](https://youtu.be/QWNUkLJ7zK4)
 
-[Testes CI/CD Automatizados]()
+[Testes CI/CD Automatizados](https://youtu.be/bEMJLQV2X0s)
 
 [Como montar seu ambiente virtual]()
 
