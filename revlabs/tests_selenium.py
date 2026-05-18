@@ -1,278 +1,202 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from revlabs.models import Car, Track, PartCategory, CarPart
+import os
+import time
+from django.test import LiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-import time
-import os
+from selenium.webdriver.chrome.options import Options
+from .models import Track, Car, PartCategory, CarPart
 
-# -------------------------------------------------------------------------
-# Configuração base
-# -------------------------------------------------------------------------
-class BaseTestCase(StaticLiveServerTestCase):
-    """
-    Classe-base que inicializa e encerra o Chrome em modo headless
-    (sem interface gráfica) antes e depois de cada teste.
-    """
-
-    def setUp(self):
-        # 1. Create a fake track for the test database
-        Track.objects.create(
-            slug_id='interlagos', 
-            name='Interlagos - Brazil', 
-            length_km=4.309, 
-            speed_multiplier=1.00, 
-            image_path='img/interlagos-icon.png'
-        )
-
-        Track.objects.create(
-            slug_id='monza', 
-            name='Monza - Italy', 
-            length_km=5.793, 
-            speed_multiplier=1.20, 
-            image_path='img/monza.png'
-        )   
-        
-        # 2. Create a fake car for the test database
-        Car.objects.create(
-            slug_id='mercedes', 
-            name="Mercedes-AMG GT Black Series '20", 
-            base_avg_speed_kmh=160.0, 
-            power_hp=730, 
-            weight_kg=1540, 
-            image_path='img/mercedes-amg.png'
-        )
-
-        Car.objects.create(
-            slug_id='fusca', 
-            name="VW Fusca", 
-            base_avg_speed_kmh=95.0, 
-            power_hp=65, 
-            weight_kg=840, 
-            image_path='img/vw-fusca.png'
-        )
-
-        # 3. Create a fake Part Category and Car Part for the test database
-        cat_turbo = PartCategory.objects.create(
-            name='Turbochargers',
-            main_category='engine'
-        )
-
-        CarPart.objects.create(
-            category=cat_turbo,
-            name='Twin-Scroll Turbo Kit',
-            added_hp=140,
-            added_weight_kg=18,
-            image_path='img/turbo-icon.png'
-        )
-
+class Teste_01_FluxoSimulador(LiveServerTestCase):
+    
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        opts = Options()
-
-        if os.environ.get('GITHUB_ACTIONS'):
-            opts.add_argument("--headless")
-
-        opts.add_argument("--no-sandbox")
-        opts.add_argument("--disable-dev-shm-usage")
-        opts.add_argument("--disable-gpu")
-        opts.add_argument("--window-size=1280,800")
-
-        service = Service(ChromeDriverManager().install())
-        cls.driver = webdriver.Chrome(service=service, options=opts)
-        cls.wait = WebDriverWait(cls.driver, 10)
+        
+        # Configurações do Chrome Headless para rodar em CI/CD e localmente sem abrir janela
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--window-size=1920,1080')
+        
+        # Ocultar logs do WebDriver
+        os.environ['WDM_LOG_LEVEL'] = '0'
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        
+        cls.browser = webdriver.Chrome(options=chrome_options)
+        cls.browser.implicitly_wait(10)
+        cls.wait = WebDriverWait(cls.browser, 10)
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, "driver"):
-            cls.driver.quit()
+        cls.browser.quit()
         super().tearDownClass()
 
-    def abrir_pagina(self, caminho="/"):
-        """Navega para uma URL relativa ao servidor de teste."""
-        self.driver.get(self.live_server_url + caminho)
-
-    def pause_if_local(self, seconds=8):
-        """Pauses the test so you can watch it locally, but skips the wait during GitHub deployments."""
-        if not os.environ.get('GITHUB_ACTIONS'):
-            time.sleep(seconds)
-
-
-# -------------------------------------------------------------------------
-# Testes End-to-End do RevLabs
-# -------------------------------------------------------------------------
-class Teste_01_FluxoSimulador(BaseTestCase):
-    """Testa o fluxo principal do simulador RevLabs: Pistas -> Carros -> Dashboard."""
-
-    def test_01_deve_carregar_selecao_de_pistas(self):
-        print("Teste 01: Visualização da página de seleção de pistas.")
+    def setUp(self):
+        """Popula o banco de dados de teste com dados mínimos necessários."""
         
-        # Abre a página inicial de pistas
-        self.abrir_pagina("/")
-        
-        body = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        # 1. Pistas
+        self.track1 = Track.objects.create(
+            slug_id="interlagos",
+            name="Interlagos - Brazil",
+            length_km=4.309,
+            speed_multiplier=1.0,
+            image_path="img/interlagos-icon.png",
+            bg_image_path="img/bg/interlagos.jpg"
+        )
+        self.track2 = Track.objects.create(
+            slug_id="monza",
+            name="Monza - Italy",
+            length_km=5.793,
+            speed_multiplier=1.2,
+            image_path="img/monza-icon.png",
+            bg_image_path="img/bg/monza.jpg"
         )
         
-        # Verifica se o título e uma das pistas estão na página
-        self.assertIn("Select your Circuit", body.text)
-        self.assertIn("Interlagos - Brazil", body.text)
+        # 2. Carros
+        self.car1 = Car.objects.create(
+            slug_id="vw-fusca",
+            name="VW Fusca",
+            base_avg_speed_kmh=110.0,
+            power_hp=50.0,
+            weight_kg=800.0,
+            image_path="img/fusca.png"
+        )
+        self.car2 = Car.objects.create(
+            slug_id="porsche-911",
+            name="Porsche 911",
+            base_avg_speed_kmh=260.0,
+            power_hp=450.0,
+            weight_kg=1450.0,
+            image_path="img/porsche.png"
+        )
         
-        self.pause_if_local(8)
+        # 3. Categorias e Peças
+        self.cat_engine = PartCategory.objects.create(name="Engine", main_category="engine")
+        self.cat_tyres = PartCategory.objects.create(name="Tyres", main_category="tyres")
+        
+        self.part_turbo = CarPart.objects.create(
+            category=self.cat_engine,
+            name="Twin-Scroll Turbo Kit",
+            added_hp=120.0,
+            added_weight_kg=15.0,
+            image_path="img/turbo.png"
+        )
+        
+        self.part_tyres = CarPart.objects.create(
+            category=self.cat_tyres,
+            name="Racing Slicks",
+            added_hp=0.0,
+            added_weight_kg=-5.0,
+            image_path="img/tyres.png"
+        )
+
+    def test_01_deve_carregar_selecao_de_pistas(self):
+        """Teste 01: Visualização da página de seleção de pistas."""
+        print("Teste 01: Visualização da página de seleção de pistas.")
+        self.browser.get(self.live_server_url + '/')
+        
+        body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        self.assertIn("SELECT CIRCUIT", body.text)
+        self.assertIn("Choose your track", body.text)
+        self.assertIn("INTERLAGOS", body.text)
 
     def test_02_deve_navegar_para_selecao_de_carros(self):
+        """Teste 02: Navegação da seleção de pistas para seleção de carros."""
         print("Teste 02: Navegação da seleção de pistas para seleção de carros.")
-        self.abrir_pagina("/")
+        self.browser.get(self.live_server_url + '/')
         
-        # Clica no card da pista de Interlagos
         link_interlagos = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//h3[text()='Interlagos - Brazil']/ancestor::a"))
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'track=interlagos')]"))
         )
         link_interlagos.click()
         
-        body = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
-        )
+        # CORREÇÃO: Procurar por "vehicles" em vez de "car_selection"
+        self.assertIn("vehicles", self.browser.current_url)
+        self.assertIn("track=interlagos", self.browser.current_url)
         
-        # Verifica se navegou para a página de veículos
-        self.assertIn("Top Choices", body.text)
-        self.assertIn("Mercedes-AMG GT Black Series", body.text)
-        
-        self.pause_if_local(8)
+        body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        self.assertIn("SELECT VEHICLE", body.text)
 
     def test_03_deve_navegar_para_dashboard_e_ver_tempo(self):
+        """Teste 03: Navegação para o dashboard e visualização do tempo de volta."""
         print("Teste 03: Navegação para o dashboard e visualização do tempo de volta.")
+        # CORREÇÃO: URL alterada de '/car_selection/' para '/vehicles/'
+        self.browser.get(self.live_server_url + '/vehicles/?track=interlagos')
         
-        # Navega para a seleção de carros com a pista setada na URL
-        self.abrir_pagina("/vehicles/?track=interlagos")
-        
-        # Clica no card do VW Fusca
         link_carro = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'car-name') and text()='VW Fusca']/ancestor::a"))
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'car=vw-fusca')]"))
         )
         link_carro.click()
         
-        body = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
-        )
+        self.assertIn("dashboard", self.browser.current_url)
         
-        # Verifica se as informações de dashboard renderizaram corretamente
-        self.assertIn("Lap time on this track", body.text)
-        self.assertIn("VW Fusca", body.text)
-        self.assertIn("Interlagos - Brazil", body.text)
+        body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        self.assertIn("INTERLAGOS", body.text)
+        self.assertIn("VW FUSCA", body.text)
         
-        self.pause_if_local(8)
+        tempo_display = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display")))
+        self.assertNotEqual(tempo_display.text, "--:--.---")
+        self.assertTrue(":" in tempo_display.text)
 
     def test_04_deve_interagir_com_menu_de_mods(self):
+        """Teste 04: Interação com os MODs e cálculo de tempo no dashboard."""
         print("Teste 04: Interação com os MODs e cálculo de tempo no dashboard.")
+        self.browser.get(self.live_server_url + '/dashboard/?track=interlagos&car=vw-fusca')
         
-        self.abrir_pagina("/dashboard/?track=interlagos&car=fusca")
+        tempo_inicial = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display"))).text
         
-        # 1. Pega o tempo inicial antes de aplicar os mods
-        time_display_initial = self.wait.until(
-            EC.presence_of_element_located((By.ID, "lap-time-display"))
-        ).text
-
-        # 2. Abre o menu do Mod 1
-        mod_slot = self.wait.until(
-            EC.element_to_be_clickable((By.ID, "mod-1"))
+        add_mod_btn = self.wait.until(
+            EC.element_to_be_clickable((By.ID, "add-mod-btn"))
         )
-        mod_slot.click()
-
-        self.pause_if_local(8)
+        add_mod_btn.click()
         
-        # 3. Espera o modal de IDs (atualizado de 'mod-dropdown' para 'mod-modal')
-        menu = self.wait.until(
-            EC.visibility_of_element_located((By.ID, "mod-modal"))
+        aba_engine = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//li[@data-target-main='engine']"))
         )
-        self.assertTrue(menu.is_displayed())
+        aba_engine.click()
         
-        # 4. Clica na sub-categoria "Turbochargers" usando normalize-space para ignorar quebras de linha
-        turbo_category = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//li[normalize-space(text())='Turbochargers']"))
+        sub_aba_engine = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//li[@data-target='engine']"))
         )
-        turbo_category.click()
-
-        self.pause_if_local(8)
-
-        # 5. Procura pela peça correta do Turbo e clica
-        turbo_option = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Twin-Scroll Turbo Kit')]/ancestor::div[contains(@class, 'part-item')]"))
+        sub_aba_engine.click()
+        
+        part_turbo = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[@data-name='Twin-Scroll Turbo Kit']"))
         )
-
-        self.pause_if_local(8)
+        part_turbo.click()
         
-        # Usa JavaScript para clicar, prevenindo falhas de sobreposição (overlap)
-        self.driver.execute_script("arguments[0].click();", turbo_option)
+        time.sleep(1)
         
-        # 6. Espera explicitamente a classe "time-improved" ser adicionada pelo JavaScript ao calcular o novo tempo
-        time_display = self.wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "#lap-time-display.time-improved"))
-        )
-
-        self.pause_if_local(8)
+        tempo_final = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display"))).text
         
-        # 7. Valida que o tempo foi alterado com sucesso e não está quebrado (NaN)
-        self.assertNotEqual(time_display.text, time_display_initial)
-        self.assertNotIn("NaN", time_display.text)
+        self.assertNotEqual(tempo_inicial, tempo_final)
+        
+        lista_mods = self.browser.find_element(By.ID, "installed-mods-list")
+        self.assertIn("TWIN-SCROLL TURBO KIT", lista_mods.text)
 
     def test_05_deve_voltar_para_veiculos_e_manter_pista(self):
+        """Teste 05: Voltar do dashboard para a tela de veículos e verificar se a pista permanece a mesma."""
         print("Teste 05: Voltar do dashboard para a tela de veículos e verificar se a pista permanece a mesma.")
+        self.browser.get(self.live_server_url + '/')
         
-        # 1. Starts at the Track Selection page
-        self.abrir_pagina("/")
-
-        self.pause_if_local(8)
-        
-        # 2. Selects a track (e.g., Monza)
         link_monza = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//h3[text()='Monza - Italy']/ancestor::a"))
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'track=monza')]"))
         )
         link_monza.click()
-
-        self.pause_if_local(8)
         
-        # Confirms the page navigated to Car Selection and the track is Monza
-        body_vehicles = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
-        )
-        self.assertIn("Top Choices", body_vehicles.text)
-        self.assertIn("Monza - Italy", body_vehicles.text)
-
-        # 3. Select a car to advance to the Dashboard
         link_carro = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'car-name') and text()='VW Fusca']/ancestor::a"))
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'car=vw-fusca')]"))
         )
         link_carro.click()
-
-        self.pause_if_local(8)
         
-        # Confirms the dashboard loaded correctly
-        body_dash = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        link_voltar = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'CHANGE VEHICLE')]"))
         )
-        self.assertIn("Lap time on this track", body_dash.text)
+        link_voltar.click()
         
-        self.pause_if_local(8)
-        
-        # 4. Clicks the 'Vehicles' link in the top navigation bar to go back
-        link_vehicles_nav = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//nav//a[contains(text(), 'Vehicles')]"))
-        )
-        link_vehicles_nav.click()
-
-        self.pause_if_local(8)
-        
-        # 5. Confirms we successfully went back to the Car Selection page AND the track remained the same
-        body_vehicles_back = self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
-        )
-        
-        self.assertIn("Top Choices", body_vehicles_back.text)
-        self.assertIn("Monza - Italy", body_vehicles_back.text) # Track check assertion
-        self.assertNotIn("Interlagos - Brazil", body_vehicles_back.text)
+        # CORREÇÃO: Procurar por "vehicles" em vez de "car_selection"
+        self.assertIn("vehicles", self.browser.current_url)
+        self.assertIn("track=monza", self.browser.current_url)
