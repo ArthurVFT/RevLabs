@@ -18,9 +18,19 @@ O sistema permite que o usuário selecione um carro, escolha uma pista e configu
 
 ## Tecnologias utilizadas
 
-- Figma (prototipagem)
-- Jira (gestão de tarefas)
-- GitHub (versionamento)
+**Desenvolvimento (Stack)**
+- [Python](https://www.python.org/) e [Django](https://www.djangoproject.com/) (Backend)
+- HTML5, CSS3, JavaScript (Frontend)
+
+**Qualidade, Testes e Deploy**
+- [Selenium](https://www.selenium.dev/) (Testes E2E Automatizados)
+- GitHub Actions (Pipeline de CI/CD)
+- [Render](https://render.com/) (Hospedagem e Deploy)
+
+**Design e Gestão**
+- Figma (Prototipagem e UI/UX)
+- Jira (Gestão de tarefas e Sprints)
+- GitHub (Versionamento de código e Bug Tracker)
 
 ---
 
