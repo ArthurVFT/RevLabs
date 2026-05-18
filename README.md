@@ -129,7 +129,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Print do Quadro da Sprint 4 do Jira](https://i.nuuls.com/6NWrj.png)
 
-[Relatório de Programação em Par]()
+[Relatório de Programação em Par](https://docs.google.com/document/d/18rJeGd_sWWeL5F85VyO92kZcIJFQ5giiUJhXFTHN9iM/edit?usp=sharing)
 
 [Testes de Sistema (E2E)](https://youtu.be/QWNUkLJ7zK4)
 
