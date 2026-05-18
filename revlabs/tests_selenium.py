@@ -113,7 +113,6 @@ class Teste_01_FluxoSimulador(LiveServerTestCase):
         )
         link_interlagos.click()
         
-        # CORREÇÃO: Procurar por "vehicles" em vez de "car_selection"
         self.assertIn("vehicles", self.browser.current_url)
         self.assertIn("track=interlagos", self.browser.current_url)
         
@@ -123,7 +122,6 @@ class Teste_01_FluxoSimulador(LiveServerTestCase):
     def test_03_deve_navegar_para_dashboard_e_ver_tempo(self):
         """Teste 03: Navegação para o dashboard e visualização do tempo de volta."""
         print("Teste 03: Navegação para o dashboard e visualização do tempo de volta.")
-        # CORREÇÃO: URL alterada de '/car_selection/' para '/vehicles/'
         self.browser.get(self.live_server_url + '/vehicles/?track=interlagos')
         
         link_carro = self.wait.until(
