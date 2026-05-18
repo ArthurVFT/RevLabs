@@ -135,6 +135,4 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Testes CI/CD Automatizados](https://youtu.be/bEMJLQV2X0s)
 
-[Como montar seu ambiente virtual]()
-
 </details>
