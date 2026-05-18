@@ -17,7 +17,8 @@ class Teste_01_FluxoSimulador(LiveServerTestCase):
         
         # Configurações do Chrome Headless para rodar em CI/CD e localmente sem abrir janela
         chrome_options = Options()
-        chrome_options.add_argument('--headless')
+        if os.environ.get('GITHUB_ACTIONS'):
+            chrome_options.add_argument("--headless")
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--window-size=1920,1080')
@@ -109,121 +110,176 @@ class Teste_01_FluxoSimulador(LiveServerTestCase):
                 )
             )
 
+    def pause_if_local(self, seconds=8):
+        if not os.environ.get('GITHUB_ACTIONS'):
+            time.sleep(seconds)
+
     def login_user(self):
         self.browser.get(self.live_server_url + '/login/')
+        self.pause_if_local(4)
         username = self.wait.until(EC.presence_of_element_located((By.NAME, "username")))
         password = self.browser.find_element(By.NAME, "password")
         username.clear()
         username.send_keys("tester")
         password.clear()
         password.send_keys("RevLabsTest123")
+        self.pause_if_local(5)
         self.browser.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
         self.wait.until(lambda browser: '/circuits/' in browser.current_url)
 
-    def test_01_deve_carregar_selecao_de_pistas(self):
-        """Teste 01: Visualização da página de seleção de pistas."""
-        print("Teste 01: Visualização da página de seleção de pistas.")
+    def test_01_fluxo_completo_selecao_ate_dashboard_com_mods(self):
+        """Teste Integrado (1 ao 4 + remoção): Navega de pistas, para veículos, dashboard, instala e remove um MOD."""
+        print("Teste Integrado: Pistas -> Veículos -> Dashboard -> Instalação/Remoção de MOD.")
+        
+        # Faz o login inicial (Substitui os logins redundantes)
         self.login_user()
         
+        # --- PARTE 1: Seleção de Pistas ---
         body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        self.pause_if_local(8)
         self.assertIn("SELECT CIRCUIT", body.text)
         self.assertIn("Choose your track", body.text)
         self.assertIn("INTERLAGOS", body.text)
 
-    def test_02_deve_navegar_para_selecao_de_carros(self):
-        """Teste 02: Navegação da seleção de pistas para seleção de carros."""
-        print("Teste 02: Navegação da seleção de pistas para seleção de carros.")
-        self.login_user()
-        
+        # --- PARTE 2: Navegar para Seleção de Veículos ---
         link_interlagos = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'track=interlagos')]"))
         )
+        self.pause_if_local(4)
         link_interlagos.click()
         
+        # Espera a URL mudar para veículos de forma fluida
+        self.wait.until(lambda browser: 'vehicles' in browser.current_url)
         self.assertIn("vehicles", self.browser.current_url)
         self.assertIn("track=interlagos", self.browser.current_url)
         
         body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         self.assertIn("SELECT VEHICLE", body.text)
 
-    def test_03_deve_navegar_para_dashboard_e_ver_tempo(self):
-        """Teste 03: Navegação para o dashboard e visualização do tempo de volta."""
-        print("Teste 03: Navegação para o dashboard e visualização do tempo de volta.")
-        self.login_user()
-        self.browser.get(self.live_server_url + '/vehicles/?track=interlagos')
-        
+        # --- PARTE 3: Escolher Carro, Navegar para Dashboard e Ver Tempo ---
         link_carro = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'car=vw-fusca')]"))
         )
+        self.pause_if_local(4)
         link_carro.click()
-        
+
+        # Espera a URL mudar para o dashboard
+        self.wait.until(lambda browser: 'dashboard' in browser.current_url)
         self.assertIn("dashboard", self.browser.current_url)
         
         body = self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         self.assertIn("INTERLAGOS", body.text)
         self.assertIn("VW FUSCA", body.text)
         
+        # Captura e valida o tempo inicial
         tempo_display = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display")))
-        self.assertNotEqual(tempo_display.text, "--:--.---")
-        self.assertTrue(":" in tempo_display.text)
+        tempo_inicial = tempo_display.text
+        self.assertNotEqual(tempo_inicial, "--:--.---")
+        self.assertTrue(":" in tempo_inicial)
+        self.pause_if_local(4)
 
-    def test_04_deve_interagir_com_menu_de_mods(self):
-        """Teste 04: Interação com os MODs e cálculo de tempo no dashboard."""
-        print("Teste 04: Interação com os MODs e cálculo de tempo no dashboard.")
-        self.login_user()
-        self.browser.get(self.live_server_url + '/dashboard/?track=interlagos&car=vw-fusca')
-        
-        tempo_inicial = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display"))).text
-        
+        # --- PARTE 4: Interagir com Menu de MODs ---
         add_mod_btn = self.wait.until(
             EC.element_to_be_clickable((By.ID, "add-mod-btn"))
         )
         add_mod_btn.click()
+
+        self.pause_if_local(4)
         
         aba_engine = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//li[@data-target-main='engine']"))
         )
         aba_engine.click()
+
+        self.pause_if_local(4)
         
         sub_aba_engine = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//li[@data-target='engine']"))
         )
         sub_aba_engine.click()
+
+        self.pause_if_local(4)
         
         part_turbo = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//div[@data-name='Twin-Scroll Turbo Kit']"))
         )
         part_turbo.click()
+
+        self.pause_if_local(4)
+        time.sleep(1) # Aguarda o cálculo de tempo ser renderizado
         
-        time.sleep(1)
-        
+        # --- VERIFICAÇÃO FINAL ---
         tempo_final = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display"))).text
         
+        # Garante que o tempo mudou após o mod
         self.assertNotEqual(tempo_inicial, tempo_final)
         
+        # Garante que o MOD apareceu na lista de instalados
         lista_mods = self.browser.find_element(By.ID, "installed-mods-list")
         self.assertIn("TWIN-SCROLL TURBO KIT", lista_mods.text)
+
+        # --- PARTE 5: Remoção do MOD (Undo) ---
+        self.pause_if_local(4)
+        
+        # Encontra o botão de remover dentro da lista de mods instalados
+        # Dica: Substitua '.remove-btn' pela classe ou tag exata que você usa no seu HTML para excluir o mod
+        btn_remover = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(@onclick, 'Twin-Scroll Turbo Kit')]")) 
+        )
+        btn_remover.click()
+
+        self.pause_if_local(4)
+        time.sleep(1) # Aguarda o recálculo de tempo após remoção
+
+        # Captura o tempo após remover a peça
+        tempo_apos_remocao = self.wait.until(EC.presence_of_element_located((By.ID, "lap-time-display"))).text
+        
+        # Valida se o tempo voltou a ser exatamente igual ao inicial
+        self.assertEqual(tempo_inicial, tempo_apos_remocao)
+        
+        # Valida se a peça sumiu da interface
+        lista_mods_atualizada = self.browser.find_element(By.ID, "installed-mods-list")
+        self.assertNotIn("TWIN-SCROLL TURBO KIT", lista_mods_atualizada.text)
 
     def test_05_deve_voltar_para_veiculos_e_manter_pista(self):
         """Teste 05: Voltar do dashboard para a tela de veículos e verificar se a pista permanece a mesma."""
         print("Teste 05: Voltar do dashboard para a tela de veículos e verificar se a pista permanece a mesma.")
         self.login_user()
+
+        self.pause_if_local(4)
         
         link_monza = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'track=monza')]"))
         )
         link_monza.click()
+
+        self.pause_if_local(4)
         
         link_carro = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'car=vw-fusca')]"))
         )
         link_carro.click()
+
+        self.pause_if_local(4)
         
         link_voltar = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'CHANGE VEHICLE')]"))
         )
         link_voltar.click()
+
+        self.pause_if_local(4)
         
         # CORREÇÃO: Procurar por "vehicles" em vez de "car_selection"
         self.assertIn("vehicles", self.browser.current_url)
         self.assertIn("track=monza", self.browser.current_url)
+
+    def test_06_nao_deve_acessar_dashboard_sem_login(self):
+        """Tenta acessar uma rota protegida e deve ser redirecionado para o login."""
+        print("Teste 06: Bloqueio de rota protegida para usuário anônimo.")
+        self.browser.get(self.live_server_url + '/dashboard/?track=interlagos&car=vw-fusca')
+
+        self.pause_if_local(4)
+        
+        # O Selenium deve observar que a URL mudou para /login/
+        self.wait.until(lambda browser: '/login/' in browser.current_url)
+        self.assertIn("login", self.browser.current_url.lower())

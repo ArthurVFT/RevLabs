@@ -121,7 +121,7 @@ Vídeo apresentando o protótipo e navegação entre as telas:
 
 [Relatório de Programação em Par]()
 
-[Testes de Sistema (E2E) Automatizados]()
+[Testes de Sistema (E2E)](https://youtu.be/QWNUkLJ7zK4)
 
 [Testes CI/CD Automatizados]()
 
