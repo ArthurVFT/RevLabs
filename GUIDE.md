@@ -11,16 +11,11 @@ ferramentas externas de captura.
 Requisitos: Python 3.14+ e (opcional) Chrome para os testes Selenium.
 
 ```powershell
-cd RevLabs_UPD
+cd RevLabs
 
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
-
-# Crie o .env local
-@"
-ENVIRONMENT=development
-SECRET_KEY=django-insecure-local-dev-key
-"@ | Set-Content .env
+copy .env.example .env
 
 # Bootstrap completo (migrate + seed + telemetria)
 .venv\Scripts\python setup.py

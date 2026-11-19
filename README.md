@@ -20,7 +20,7 @@ rodá-lo localmente ou fazer deploy.
 ## Estrutura
 
 ```
-RevLabs_UPD/
+RevLabs/
 ├── project/                  # settings, urls, wsgi
 ├── revlabs/
 │   ├── models.py             # Car, Track, CarPart, PartAdjustment, TelemetryLap
@@ -43,10 +43,10 @@ RevLabs_UPD/
 ## Quick start (Windows)
 
 ```powershell
-cd RevLabs_UPD
+cd RevLabs
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
-copy .env.example .env   # se existir; senão crie o seu
+copy .env.example .env
 .venv\Scripts\python setup.py
 .venv\Scripts\python manage.py runserver
 ```

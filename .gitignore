@@ -136,9 +136,15 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Banco de dados / ambiente
 .env
+.env.*
+!.env.example
 .envrc
+
+# Tooling local de agentes
+.opencode/
+
 .venv
 env/
 venv/
