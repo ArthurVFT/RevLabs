@@ -15,4 +15,6 @@ urlpatterns = [
     path('circuits/', views.track_selection, name='track_selection'),
     path('vehicles/', views.car_selection, name='car_selection'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('api/laps/', views.api_telemetry_laps, name='api_telemetry_laps'),
+    path('api/import-telemetry/', views.api_import_telemetry, name='api_import_telemetry'),
 ]

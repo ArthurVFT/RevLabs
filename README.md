@@ -1,138 +1,151 @@
 # RevLabs
 
-Simulador de configuração de carros e tempo de volta em diferentes circuitos.
+Simulador de tuning para Gran Turismo 7: catálogo de peças, ajustes por peça,
+física determinística e comparação de voltas com telemetria real.
 
-O sistema permite que o usuário selecione um carro, escolha uma pista e configure peças do veículo (como turbo e aerofólio) para simular o tempo de volta estimado.
-
----
-
-## Integrantes
-
-- Arthur Vitorino Fernandes [LinkedIn](https://www.linkedin.com/in/arthurvitorinofernandes/)
-- Daniel Donaire da Costa [LinkedIn](https://www.linkedin.com/in/dandonaire/)
-- Juan Riquelme Xavier de Souza [LinkedIn](https://www.linkedin.com/in/juanriquelmexavierdesouza/)
-- Kelwin Karan Leal Silva [LinkedIn](https://www.linkedin.com/in/kev-karan/)
-- Victor Carraly Henrique de Lima Menezes [LinkedIn](https://www.linkedin.com/in/victorcarraly/)
+O repositório contém **apenas o site Django** e os dados necessários para
+rodá-lo localmente ou fazer deploy.
 
 ---
 
-## Tecnologias utilizadas
+## Stack
 
-**Desenvolvimento (Stack)**
-- [Python](https://www.python.org/) e [Django](https://www.djangoproject.com/) (Backend)
-- HTML5, CSS3, JavaScript (Frontend)
-
-**Qualidade, Testes e Deploy**
-- [Selenium](https://www.selenium.dev/) (Testes E2E Automatizados)
-- GitHub Actions (Pipeline de CI/CD)
-- [Render](https://render.com/) (Hospedagem e Deploy)
-
-**Design e Gestão**
-- Figma (Prototipagem e UI/UX)
-- Jira (Gestão de tarefas e Sprints)
-- GitHub (Versionamento de código e Bug Tracker)
+- Python 3.14 + Django 6
+- SQLite em desenvolvimento / PostgreSQL em produção (`DATABASE_URL`)
+- WhiteNoise para estáticos
+- Selenium para testes de fluxo (CI)
 
 ---
 
-## Descrição do Sistema
+## Estrutura
 
-O RevLabs é um simulador que permite testar diferentes configurações de carros em circuitos famosos.
-
-O usuário poderá:
-
-- escolher um carro
-- selecionar uma pista
-- configurar peças do veículo
-- rodar uma simulação de tempo de volta
-
-## Entregaveis
-
-<details>
-<summary>Entrega 1 ✅</summary>
-
-### Histórias de Usuário
-
-Documento contendo as histórias de usuário com critérios de aceitação em BDD:
-
-📄 [https://link-do-documento](https://docs.google.com/document/d/1ylAPzfrxl0tnJQPsLe2L74v1lK6PWeTgYh0vW_3gYVc/edit?tab=t.0)
-
----
-
-### Quadro da Sprint e Backlog
-
-Link do Jira:
-
-[Link do Jira](https://revlabsfds.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog)
-
-Print do quadro no Jira:
-
-![Jira Board](https://i.nuuls.com/cy9RB.png)
-![Jira Sprints](https://i.nuuls.com/Atnze.png)
+```
+RevLabs/
+├── project/                  # settings, urls, wsgi
+├── revlabs/
+│   ├── models.py             # Car, Track, CarPart, PartAdjustment, TelemetryLap
+│   ├── views.py              # landing, seleção, dashboard, APIs
+│   ├── telemetry_import.py   # validação + import JSON (única entrada)
+│   ├── telemetry_profile.py  # perfil de pilotagem e impacto de peças
+│   ├── data/
+│   │   └── telemetry_bundle.json   # seed de voltas (formato v1)
+│   ├── templates/
+│   └── static/
+├── import_telemetry.py       # CLI de importação
+├── setup.py                  # bootstrap de clone novo
+├── TELEMETRY_FORMAT.md       # especificação do JSON de telemetria
+├── GUIDE.md                  # guia detalhado de uso local
+└── build.sh                  # build de deploy (Render)
+```
 
 ---
 
-### Protótipo Lo-Fi
+## Quick start (Windows)
 
-Protótipo criado no Figma:
+```powershell
+cd RevLabs
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+copy .env.example .env
+.venv\Scripts\python setup.py
+.venv\Scripts\python manage.py runserver
+```
 
-🎨 [https://link-do-lo-fi](https://www.figma.com/site/OdIN6Yz3m5tqLyyUDy6ttZ/FDS?node-id=0-1&p=f&t=3mvTGMUEcpts8sa0-0)
+Acesse <http://127.0.0.1:8000>.
+
+### `.env` mínimo
+
+```env
+ENVIRONMENT=development
+SECRET_KEY=django-insecure-local-dev-key
+```
+
+Em produção, use `ENVIRONMENT=production`, `SECRET_KEY` forte e `DATABASE_URL`.
 
 ---
 
-### Demonstração do Protótipo
+## Setup manual
 
-Vídeo apresentando o protótipo e navegação entre as telas:
+```powershell
+.venv\Scripts\python manage.py migrate
+.venv\Scripts\python populate_data.py
+.venv\Scripts\python populateparts.py
+.venv\Scripts\python populate_gt7_parts.py
+.venv\Scripts\python populate_adjustments.py
+.venv\Scripts\python import_telemetry.py
+.venv\Scripts\python manage.py createsuperuser
+.venv\Scripts\python manage.py runserver
+```
 
-🎥 [https://link-do-video](https://youtu.be/pgiNw_tMMXU)
+> Atenção: `populate_data.py` e `populateparts.py` recriam o catálogo e
+> **apagam** registros existentes (inclusive voltas de telemetria em cascata).
+> Use-os apenas no bootstrap de um banco vazio.
 
 ---
 
-</details>
-<details>
-<summary>Entrega 2 ✅</summary>
+## Telemetria
 
-[Print da Sprint no Jira](https://i.nuuls.com/n8WPa.png)
+A telemetria é um JSON próprio do RevLabs. Especificação completa:
+**[TELEMETRY_FORMAT.md](TELEMETRY_FORMAT.md)**.
 
-[Print das Issues/Bug tracker no Github](https://i.nuuls.com/2WU6Q.png)
+```powershell
+# Importa o seed embutido
+python import_telemetry.py
 
-[Print do Quadro da Sprint 2 do Jira](https://i.nuuls.com/wiZab.png)
+# Importa um arquivo específico
+python import_telemetry.py minha_telemetria.json
 
-[Relatório de Programação em Par](https://docs.google.com/document/d/1KhiwB4KT0rFdzc8w5vW9K5M92utWW6er6-CfM0SG48Q/edit?tab=t.0)
+# Via Django
+python manage.py import_telemetry minha_telemetria.json
+```
 
-[Link do Deploy](https://revlabs.onrender.com/)
+Pela web: dashboard → **IMPORT TELEMETRY (.JSON)**.
 
-[Vídeo de Apresentação e Instruções](https://youtu.be/fax3VEnTpkw)
+Regras principais:
 
-</details>
-<details>
-<summary>Entrega 3 ✅</summary>
+- `car_code` e `track_id` precisam existir em `Car` / `Track`;
+- setores são recalculados a partir dos frames quando disponíveis;
+- apenas as 10 voltas mais rápidas por carro + pista são mantidas;
+- importações repetidas são ignoradas por `external_id`.
 
-[Print da Sprint no Jira](https://i.nuuls.com/-Dxee.png)
+---
 
-[Print das Issues/Bug tracker no Github](https://i.nuuls.com/QlL1Z.png)
+## Deploy (Render)
 
-[Print do Quadro da Sprint 3 do Jira](https://i.nuuls.com/d7Tmb.png)
+1. Configure as variáveis de ambiente:
+   - `ENVIRONMENT=production`
+   - `SECRET_KEY=<chave forte>`
+   - `DATABASE_URL=<postgres>`
+2. Build command:
+   ```bash
+   ./build.sh
+   ```
+3. Release/first-run (uma vez, no shell do Render):
+   ```bash
+   python setup.py
+   ```
+   Ou, se o banco já estiver populado:
+   ```bash
+   python manage.py migrate
+   python import_telemetry.py
+   ```
 
-[Relatório de Programação em Par](https://docs.google.com/document/d/194o1doQW1E4v-90YMKiuOCRkSrbtxARQBFQzuJJ3ho8/edit?tab=t.0)
+`build.sh` roda `collectstatic` e `migrate` a cada deploy.
 
-[Testes de Sistema (E2E) Automatizados](https://youtu.be/YhEv19FcJ48)
+---
 
-[Vídeo de Apresentação e Instruções](https://youtu.be/GqIwE72qJMY)
+## Testes
 
-</details>
-<details>
-<summary>Entrega 4 ✅</summary>
+```powershell
+.venv\Scripts\python manage.py check
+.venv\Scripts\python manage.py test
+```
 
-[Print do Backlog do Jira](https://i.nuuls.com/I1wje.png)
+Os testes de fluxo usam Selenium/Chrome headless.
 
-[Print das Issues/Bug tracker no Github](https://i.nuuls.com/u3Ax7.png)
+---
 
-[Print do Quadro da Sprint 4 do Jira](https://i.nuuls.com/6NWrj.png)
+## Documentação
 
-[Relatório de Programação em Par](https://docs.google.com/document/d/18rJeGd_sWWeL5F85VyO92kZcIJFQ5giiUJhXFTHN9iM/edit?usp=sharing)
-
-[Testes de Sistema (E2E)](https://youtu.be/QWNUkLJ7zK4)
-
-[Testes CI/CD Automatizados](https://youtu.be/bEMJLQV2X0s)
-
-</details>
+- [GUIDE.md](GUIDE.md) — uso local, arquitetura e troubleshooting
+- [TELEMETRY_FORMAT.md](TELEMETRY_FORMAT.md) — formato JSON de telemetria
