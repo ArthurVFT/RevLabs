@@ -8,6 +8,6 @@ admin.site.register(CarPart)
 
 @admin.register(TelemetryLap)
 class TelemetryLapAdmin(admin.ModelAdmin):
-    list_display = ['car', 'track', 'lap_number', 'lap_time_seconds', 'max_speed_kmh', 'imported_at']
+    list_display = ['car', 'track', 'lap_number', 'lap_time_seconds', 'max_speed_kmh', 'source', 'imported_at']
     list_filter = ['car', 'track', 'is_complete']
     ordering = ['lap_time_ms']

@@ -111,6 +111,14 @@ class TelemetryLap(models.Model):
     avg_throttle_pct = models.FloatField(null=True, blank=True)
     avg_brake_pct = models.FloatField(null=True, blank=True)
     session_notes = models.TextField(null=True, blank=True)
+    source = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text="Origin label from the import file (e.g. 'manual', 'bundle')"
+    )
+    source_lap_id = models.CharField(
+        max_length=200, null=True, blank=True,
+        help_text="Stable lap ID in the source file, used to avoid duplicate imports"
+    )
     original_session_id = models.IntegerField(null=True, blank=True)
     original_lap_id = models.IntegerField(null=True, blank=True)
     sector_1_ms = models.IntegerField(null=True, blank=True, help_text="Sector 1 time in milliseconds")
@@ -124,6 +132,7 @@ class TelemetryLap(models.Model):
         indexes = [
             models.Index(fields=['car', 'track', 'lap_time_ms']),
             models.Index(fields=['car', 'track', 'is_complete']),
+            models.Index(fields=['car', 'track', 'source_lap_id'], name='revlabs_tl_car_track_srcid_idx'),
         ]
 
     def __str__(self):

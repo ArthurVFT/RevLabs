@@ -1,10 +1,13 @@
+import io
 import json
+
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 
 from .forms import RevLabsAuthenticationForm, RevLabsUserCreationForm
 from .models import Car, Track, PartCategory, TelemetryLap, CarPart, PartAdjustment
@@ -268,44 +271,60 @@ def api_telemetry_laps(request):
     return JsonResponse({'laps': data})
 
 
+MAX_TELEMETRY_UPLOAD_BYTES = 10 * 1024 * 1024
+
+
 @login_required
+@require_POST
 def api_import_telemetry(request):
     """
-    Import telemetry laps.
-    - GET:  import from TelemetryIQ SQLite database (uses db_path param or default)
-    - POST: import from uploaded JSON export file (multipart form, field name: 'file')
+    Import telemetry laps from an uploaded JSON file.
+
+    Multipart form field name: ``file``. Only the first-party format
+    documented in ``TELEMETRY_FORMAT.md`` is accepted.
     """
-    import tempfile, io
+    from revlabs.telemetry_import import run_import_from_json_data
 
-    if request.method == 'POST' and request.FILES.get('file'):
-        from revlabs.telemetry_import import run_import_from_json
-        uploaded = request.FILES['file']
-        suffix = '.json'
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-            for chunk in uploaded.chunks():
-                tmp.write(chunk)
-            tmp_path = tmp.name
-        try:
-            buf = io.StringIO()
-            result = run_import_from_json(tmp_path, print_func=lambda msg: buf.write(msg + '\n'))
-            result['log'] = buf.getvalue()
-        finally:
-            import os
-            os.unlink(tmp_path)
+    uploaded = request.FILES.get('file')
+    if not uploaded:
+        return JsonResponse(
+            {'status': 'error', 'message': "Nenhum arquivo enviado (campo 'file')."},
+            status=400,
+        )
 
-        if result.get('error'):
-            return JsonResponse({'status': 'error', 'message': result['error'], 'log': result['log']}, status=400)
-        return JsonResponse({'status': 'ok', **result})
+    if not uploaded.name.lower().endswith('.json'):
+        return JsonResponse(
+            {'status': 'error', 'message': 'Apenas arquivos .json são aceitos.'},
+            status=400,
+        )
 
-    from revlabs.telemetry_import import run_import
+    if uploaded.size > MAX_TELEMETRY_UPLOAD_BYTES:
+        return JsonResponse(
+            {'status': 'error', 'message': 'Arquivo maior que 10 MB.'},
+            status=400,
+        )
 
-    db_path = request.GET.get('db_path') or r'..\TelemetryIQ\telemetry.db'
+    try:
+        data = json.load(uploaded)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return JsonResponse(
+            {'status': 'error', 'message': f'JSON inválido: {exc}'},
+            status=400,
+        )
 
     buf = io.StringIO()
-    result = run_import(db_path, print_func=lambda msg: buf.write(msg + '\n'))
+    result = run_import_from_json_data(data, print_func=lambda msg: buf.write(msg + '\n'))
     result['log'] = buf.getvalue()
 
     if result.get('error'):
-        return JsonResponse({'status': 'error', 'message': result['error'], 'log': result['log']}, status=400)
+        return JsonResponse(
+            {
+                'status': 'error',
+                'message': result['error'],
+                'errors': result.get('errors', []),
+                'log': result['log'],
+            },
+            status=400,
+        )
 
     return JsonResponse({'status': 'ok', **result})

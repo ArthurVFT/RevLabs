@@ -1,227 +1,222 @@
-# RevLabs Setup & Usage Guide
+# RevLabs — Guia de uso local
 
-## Project Structure
-
-```
-C:\Users\user\RevLabs\
-├── TelemetryIQ\           # GT7 telemetry capture app (separate project)
-│   ├── telemetry.db       # Raw telemetry data (SQLite)
-│   ├── Makefile            # Unix-style (won't work on Windows directly)
-│   └── ...
-└── RevLabs_UPD\           # Django web app (this project)
-    ├── manage.py
-    ├── import_telemetry.py # CLI import script
-    └── ...
-```
+Este guia cobre a instalação, execução, importação de telemetria e
+manutenção do banco. O repositório é autossuficiente e não requer
+ferramentas externas de captura.
 
 ---
 
-## TelemetryIQ Setup (Windows)
+## 1. Instalação
 
-`make` does **not** work on Windows PowerShell because the Makefile uses Unix paths (`.venv/bin/pip`). Instead, run the commands manually:
+Requisitos: Python 3.14+ e (opcional) Chrome para os testes Selenium.
 
 ```powershell
-cd C:\Users\user\RevLabs\TelemetryIQ
+cd RevLabs_UPD
 
-# Create virtual environment
 python -m venv .venv
-
-# Install dependencies
 .venv\Scripts\pip install -r requirements.txt
 
-# Run TelemetryIQ
-cd C:\Users\user\RevLabs\TelemetryIQ
-$env:PS_IP = "192.168.X.XXX"  # substitua pelo IP do seu PlayStation
-.venv\Scripts\python -m rexy
+# Crie o .env local
+@"
+ENVIRONMENT=development
+SECRET_KEY=django-insecure-local-dev-key
+"@ | Set-Content .env
+
+# Bootstrap completo (migrate + seed + telemetria)
+.venv\Scripts\python setup.py
 ```
 
-To use `make` on Windows, install it via:
-- **Chocolatey**: `choco install make`
-- **Git Bash**: included with Git for Windows
-- **WSL**: native Linux make
+O `setup.py` executa:
 
-Then run `make install` from **Git Bash** or **WSL**, NOT from PowerShell.
+1. `manage.py migrate`
+2. `populate_data.py` — carros e pistas
+3. `populateparts.py` — catálogo base de peças
+4. `populate_gt7_parts.py` — peças GT7 extras
+5. `populate_adjustments.py` — parâmetros ajustáveis
+6. `import_telemetry.py` — seed `revlabs/data/telemetry_bundle.json`
+7. criação opcional de superusuário
+
+Depois:
+
+```powershell
+.venv\Scripts\python manage.py runserver
+```
+
+Site em <http://127.0.0.1:8000>. Admin em `/admin/`.
 
 ---
 
-## RevLabs Setup
+## 2. Estrutura do projeto
+
+```
+project/
+  settings.py          # SQLite em dev, PostgreSQL em produção
+  urls.py
+revlabs/
+  models.py            # Car, Track, CarPart, PartAdjustment, TelemetryLap
+  views.py             # landing, seleção, dashboard, APIs
+  telemetry_import.py  # validação + import do JSON
+  telemetry_profile.py # perfil de pilotagem + impacto de peças
+  data/telemetry_bundle.json
+  templates/
+  static/
+import_telemetry.py    # CLI de import
+setup.py               # bootstrap
+TELEMETRY_FORMAT.md    # spec do JSON
+```
+
+---
+
+## 3. Importação de telemetria
+
+### Formato
+
+O único formato aceito é o JSON do RevLabs, documentado em
+[TELEMETRY_FORMAT.md](TELEMETRY_FORMAT.md). Exemplo mínimo:
+
+```json
+{
+  "format": "revlabs.telemetry",
+  "version": 1,
+  "laps": [
+    {
+      "external_id": "session-1-lap-4",
+      "car_code": 3485,
+      "track_id": 152,
+      "lap_number": 4,
+      "lap_time_ms": 101041,
+      "sector_1_ms": 29016,
+      "sector_2_ms": 43616,
+      "sector_3_ms": 28409
+    }
+  ]
+}
+```
+
+### Caminhos de importação
 
 ```powershell
-cd C:\Users\user\RevLabs\RevLabs_UPD
+# Seed embutido
+python import_telemetry.py
 
-# Activate virtual environment (if not already)
-.venv\Scripts\activate
+# Arquivo específico
+python import_telemetry.py dados.json
 
-# Run migrations
+# Django
+python manage.py import_telemetry dados.json
+```
+
+Web: dashboard → **IMPORT TELEMETRY (.JSON)**.
+
+### Regras
+
+- `car_code` e `track_id` precisam existir no banco;
+- voltas duplicadas (`external_id`) são ignoradas;
+- mantém as 10 voltas mais rápidas por carro + pista;
+- setores são recalculados quando há frames 3D suficientes.
+
+---
+
+## 4. Setores
+
+Setores podem vir prontos no JSON. Se `frames` for enviado:
+
+1. calcula-se a distância acumulada entre `(position_x, position_y, position_z)`;
+2. descarta-se o cálculo se a distância for < 80% de `Track.length_km`;
+3. acha-se os índices em 1/3 e 2/3 da distância;
+4. usa-se o `ts` de cada fronteira;
+5. normaliza-se para `sector_1 + sector_2 + sector_3 == lap_time_ms`.
+
+O **Best Projected Lap** exibido no dashboard é a soma dos melhores setores
+entre as voltas importadas — não é o melhor tempo bruto.
+
+---
+
+## 5. Adicionar carro ou pista
+
+```powershell
+.venv\Scripts\python manage.py shell
+```
+
+```python
+from revlabs.models import Car, Track
+
+Car.objects.create(
+    slug_id='ferrari-f40',
+    name='Ferrari F40',
+    base_avg_speed_kmh=180,
+    power_hp=478,
+    weight_kg=1100,
+    image_path='img/cars/ferrari-f40.png',
+    car_code=1234,
+)
+
+Track.objects.create(
+    slug_id='monza',
+    name='Monza',
+    length_km=5.793,
+    speed_multiplier=1.05,
+    image_path='img/layout/monza.png',
+    bg_image_path='img/bg/monza.jpg',
+    track_id=456,
+)
+```
+
+O `car_code` e o `track_id` são os identificadores GT7 usados no JSON.
+
+IDs atualmente configurados:
+
+| Item | ID |
+|---|---|
+| Porsche 911 GT3 RS (992) | `car_code=3539` |
+| Mercedes-AMG GT Black Series '20 | `car_code=3485` |
+| Interlagos | `track_id=152` |
+
+---
+
+## 6. Comandos úteis
+
+```powershell
+python manage.py check
+python manage.py makemigrations --check --dry-run
 python manage.py migrate
-
-# Seed data
-python populate_data.py       # Cars and tracks
-python populateparts.py       # GT7 parts catalog (91 parts)
-python populate_adjustments.py  # Tuning adjustments (55 parameters)
-
-# Create admin user (optional)
 python manage.py createsuperuser
-
-# Run development server
-python manage.py runserver
+python manage.py collectstatic --noinput
+python manage.py test
 ```
 
 ---
 
-## How to Export Laps from TelemetryIQ
+## 7. Deploy
 
-Laps are automatically recorded by TelemetryIQ while you drive in GT7. The data is stored in `TelemetryIQ\telemetry.db`.
+Variáveis de ambiente:
 
-**To verify laps were recorded:**
-
-```powershell
-cd C:\Users\user\RevLabs\RevLabs_UPD
-.venv\Scripts\python -c "
-import sqlite3
-conn = sqlite3.connect(r'..\TelemetryIQ\telemetry.db')
-cur = conn.cursor()
-cur.execute('''
-    SELECT l.id, l.lap_number, l.lap_time_ms, l.is_complete, l.car_code, l.track_id
-    FROM laps l
-    WHERE l.is_complete = 1 AND l.lap_time_ms IS NOT NULL AND l.lap_time_ms > 0
-    ORDER BY l.lap_time_ms
-''')
-for r in cur.fetchall():
-    time_s = r[2] / 1000.0
-    print(f'Lap {r[1]}: {time_s:.3f}s  car_code={r[4]} track_id={r[5]}')
-conn.close()
-"
+```env
+ENVIRONMENT=production
+SECRET_KEY=<chave forte>
+DATABASE_URL=postgres://...
 ```
 
-**Important**: TelemetryIQ records `car_code` and `track_id` per GT7 internal IDs. For RevLabs to import a lap, both must be non-null and must match a Car/Track in the RevLabs database.
+Build: `./build.sh` (collectstatic + migrate).
 
-Current known IDs:
-- Car 3539 → Porsche 911 GT3 RS (992)
-- Track 152 → Autódromo José Carlos Pace (Interlagos)
+Primeira execução em banco vazio:
+
+```bash
+python setup.py
+```
+
+> `populate_data.py` apaga carros/pistas existentes (e voltas em cascata).
+> Em banco já populado, rode apenas `migrate` e `import_telemetry.py`.
 
 ---
 
-## Portable JSON Export
+## 8. Troubleshooting
 
-You can export laps from TelemetryIQ as a standalone JSON file and import it anywhere (even without TelemetryIQ installed).
-
-### Export
-
-```powershell
-cd C:\Users\user\RevLabs\RevLabs_UPD
-.venv\Scripts\python export_telemetry.py
-# Optional: specify custom db and output paths:
-.venv\Scripts\python export_telemetry.py "..\TelemetryIQ\telemetry.db" "my_export.json"
-```
-
-This creates `telemetry_export.json` containing all complete laps with their frames, stats, and metadata. The file is self-contained — it can be shared, backed up, or imported on a deployed instance.
-
-### Import from JSON
-
-Same as the regular import, just pass the `.json` file instead of `.db`:
-
-```powershell
-# CLI
-.venv\Scripts\python import_telemetry.py telemetry_export.json
-
-# Management command
-.venv\Scripts\python manage.py import_telemetry telemetry_export.json
-```
-
-The importer auto-detects `.json` vs `.db` by the file extension.
-
----
-
-## How to Import Laps into RevLabs
-
-There are **four ways** to import:
-
-### 1. CLI (standalone script)
-```powershell
-cd C:\Users\user\RevLabs\RevLabs_UPD
-.venv\Scripts\python import_telemetry.py
-# Optional: specify a different TelemetryIQ db path:
-.venv\Scripts\python import_telemetry.py "C:\path\to\telemetry.db"
-# Import from JSON export:
-.venv\Scripts\python import_telemetry.py telemetry_export.json
-```
-
-### 2. Django management command
-```powershell
-cd C:\Users\user\RevLabs\RevLabs_UPD
-.venv\Scripts\python manage.py import_telemetry
-# Optional: specify a different path:
-.venv\Scripts\python manage.py import_telemetry "C:\path\to\telemetry.db"
-.venv\Scripts\python manage.py import_telemetry telemetry_export.json
-```
-
-### 3. Web interface — TelemetryIQ DB import (local/dev only)
-1. Start the server: `python manage.py runserver`
-2. Log in, navigate to the **Dashboard** (select a car + track)
-3. Click the **IMPORT TELEMETRY** button below the lap time display
-4. The page will reload automatically after import completes
-
-### 4. Web interface — JSON file upload (works anywhere, including deployed)
-1. Start the server and log in to the Dashboard
-2. Click **IMPORT FROM FILE...** below the IMPORT TELEMETRY button
-3. Select a `.json` export file (from `export_telemetry.py`)
-4. The page will reload automatically after import completes
-
-**What the import does:**
-- Reads completed laps from TelemetryIQ's SQLite database **or** a JSON export file
-- For each lap matching a known car+track, creates a `TelemetryLap` record
-- Calculates sector times from 3D position data (cumulative distance → 1/3 splits)
-- Rejects laps with cumulative distance < 80% of track length (incomplete recordings)
-- Keeps only the top 10 fastest laps per car+track combination
-- Shows per-car/per-track statistics in the console/log
-
----
-
-## Adding New Cars or Tracks for Telemetry
-
-To make the importer recognize new GT7 cars/tracks:
-
-1. Add the car to RevLabs:
-   ```powershell
-   cd C:\Users\user\RevLabs\RevLabs_UPD
-   .venv\Scripts\python manage.py shell
-   ```
-   ```python
-   from revlabs.models import Car, Track
-   Car.objects.create(name='Ferrari F40', slug_id='ferrari-f40',
-       base_avg_speed_kmh=180, power_hp=478, weight_kg=1100,
-       car_code=1234, image_path='img/ferrari-f40.png')
-   Track.objects.create(name='Monza', slug_id='monza',
-       length_km=5.793, speed_multiplier=1.05, track_id=456,
-       image_path='img/monza-layout.png')
-   ```
-
-2. Run the import again.
-
----
-
-## Sector Times: How They Work
-
-Sector times are **not directly exported** by TelemetryIQ. They are calculated from **3D position data**:
-
-1. **Cumulative distance** — Euclidean distance between consecutive `(position_x, position_y, position_z)` frames
-2. **Track filter** — only laps with cumulative distance >= 80% of actual track length are processed (prevents short/incomplete recordings)
-3. **Equal 1/3 splits** — frame indices where cumulative distance reaches 1/3 and 2/3 of total distance
-4. **Timestamps** — the `ts` (Unix timestamp) difference at each boundary gives raw sector times
-5. **Normalization** — scaled so `sector_1 + sector_2 + sector_3 == lap_time_ms` (matching GT7 official time)
-
-The **Best Projected Lap** = best S1 + best S2 + best S3 across all laps. This is the reference time used for tuning calculations, not the raw best lap.
-
----
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| `make` command not found | Install make (choco, Git Bash, WSL) or run commands manually (see above) |
-| Import finds 0 laps | Check TelemetryIQ recorded data: `car_code` and `track_id` must be non-null |
-| "No matching car/track" | Add the car/track to RevLabs database first |
-| Sector times not calculated | Lap may have < 80% of track length in cumulative distance (incomplete recording) |
-| Lap time seems wrong | Check `lap_time_ms` in telemetry.db directly; it's the GT7-reported official time |
-| Web import button not working | Ensure server is running and you're logged in; check browser console for errors |
+| Problema | Solução |
+|---|---|
+| Import encontra 0 voltas | Verifique `car_code` / `track_id` e se o carro/pista existem no banco |
+| "Nenhuma volta" com JSON válido | Confira se `laps` não está vazio e se os IDs batem |
+| Setores ausentes | Envie `sector_*_ms` ou frames com posição 3D suficientes |
+| Lap time errado | `lap_time_ms` é a fonte oficial; setores são normalizados a ele |
+| Estáticos não aparecem em produção | Rode `collectstatic`; WhiteNoise já está configurado |
+| Erro de banco no deploy | Confira `DATABASE_URL` e `ENVIRONMENT=production` |

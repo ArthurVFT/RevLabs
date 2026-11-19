@@ -715,31 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Import Telemetry from TelemetryIQ database
-    const btnImport = document.getElementById('btn-import-telemetry');
-    if (btnImport) {
-        btnImport.addEventListener('click', async () => {
-            btnImport.disabled = true;
-            btnImport.textContent = 'IMPORTING...';
-            try {
-                const resp = await fetch('/api/import-telemetry/');
-                const data = await resp.json();
-                if (data.status === 'ok') {
-                    showSystemModal('TELEMETRY IMPORT', `Imported ${data.imported} laps. ${data.skipped} skipped. ${data.trimmed} trimmed.`, false);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showSystemModal('IMPORT ERROR', data.message || 'Unknown error');
-                }
-            } catch (e) {
-                showSystemModal('IMPORT ERROR', e.message);
-            } finally {
-                btnImport.disabled = false;
-                btnImport.textContent = 'IMPORT TELEMETRY';
-            }
-        });
-    }
-
-    // Import Telemetry from uploaded file
+    // Import telemetry from an uploaded JSON file
     const btnImportFile = document.getElementById('btn-import-from-file');
     const fileInput = document.getElementById('import-file-input');
     if (btnImportFile && fileInput) {
@@ -758,13 +734,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSystemModal('IMPORT COMPLETE', `Imported ${data.imported} laps from ${file.name}. ${data.skipped} skipped. ${data.trimmed} trimmed.`, false);
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showSystemModal('IMPORT ERROR', data.message || 'Unknown error');
+                    const details = (data.errors && data.errors.length) ? `\n${data.errors.slice(0, 5).join('\n')}` : '';
+                    showSystemModal('IMPORT ERROR', (data.message || 'Unknown error') + details);
                 }
             } catch (e) {
                 showSystemModal('IMPORT ERROR', e.message);
             } finally {
                 btnImportFile.disabled = false;
-                btnImportFile.textContent = 'IMPORT FROM FILE...';
+                btnImportFile.textContent = 'IMPORT TELEMETRY (.JSON)';
                 fileInput.value = '';
             }
         });
